@@ -61,8 +61,12 @@ public class TestUtils {
     }
 
     public UserEntity createTestUser(String loginHash) {
+        return createTestUser(loginHash, false);
+    }
+
+    public UserEntity createTestUser(String loginHash, boolean permission2) {
         String loginHashHash = Bcrypt.hash(loginHash);
-        UserEntity testUser = new UserEntity("username", "", "salt", loginHashHash, "masterKey", false);
+        UserEntity testUser = new UserEntity(loginHash, "", "salt", loginHashHash, "masterKey", permission2);
         testUser.setInit(true);
         testUser.setReset(true);
         testUser.setMasterKey("masterKey");
@@ -109,7 +113,8 @@ public class TestUtils {
                 "person2",
                 1994,
                 1995,
-                System.currentTimeMillis());
+                System.currentTimeMillis(),
+                false);
     }
 
     public RequestBodyAddVideo createAddAnotherVideoRequest() throws IOException {
@@ -127,12 +132,13 @@ public class TestUtils {
                 "person4",
                 1996,
                 1997,
-                System.currentTimeMillis()+60000);
+                System.currentTimeMillis()+60000,
+                true);
     }
 
     private RequestBodyAddVideo createAddVideoRequest(
             String title, String key, String iv, String m3u8, String m3u8Key, String m3u8Iv, String thumbnail,
-            String thumbnailKey, String thumbnailIv, String person1, String person2, int year1, int year2, long time)
+            String thumbnailKey, String thumbnailIv, String person1, String person2, int year1, int year2, long time, boolean permission2)
                 throws IOException {
 
         RequestBodyAddVideo addVideoRequest = new RequestBodyAddVideo();
@@ -152,6 +158,7 @@ public class TestUtils {
         addVideoRequest.setRecordedInGardelegen(false);
         addVideoRequest.setTimestamp(time);
         addVideoRequest.setShowDateValues(2);
+        addVideoRequest.setPermission2(permission2);
         createTestFile(m3u8);
         createTestFile(thumbnail);
         return addVideoRequest;
