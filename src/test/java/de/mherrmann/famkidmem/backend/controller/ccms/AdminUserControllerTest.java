@@ -169,6 +169,42 @@ public class AdminUserControllerTest {
         assertInternalThingsKeptInternal(usersResponse);
     }
 
+    @Test
+    public void shouldEnablePermission2() throws Exception {
+        testUser.setPermission2(false);
+        userRepository.save(testUser);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/ccms/admin/user/enablePermission2/{username}", testUser.getUsername())
+                        .header("CCMS-AUTH-TOKEN", "token"))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn();
+
+        UserEntity user = userRepository.findByUsername(testUser.getUsername()).get();
+        String message = jsonToResponse(mvcResult.getResponse().getContentAsString()).getMessage();
+        String details = jsonToResponse(mvcResult.getResponse().getContentAsString()).getDetails();
+        assertThat(message).isEqualTo("ok");
+        assertThat(details).isEqualTo("Successfully enabled permission2 for user: " + testUser.getUsername());
+        assertThat(user.isPermission2()).isTrue();
+    }
+
+    @Test
+    public void shouldDisablePermission2() throws Exception {
+        testUser.setPermission2(true);
+        userRepository.save(testUser);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/ccms/admin/user/disablePermission2/{username}", testUser.getUsername())
+                        .header("CCMS-AUTH-TOKEN", "token"))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn();
+
+        UserEntity user = userRepository.findByUsername(testUser.getUsername()).get();
+        String message = jsonToResponse(mvcResult.getResponse().getContentAsString()).getMessage();
+        String details = jsonToResponse(mvcResult.getResponse().getContentAsString()).getDetails();
+        assertThat(message).isEqualTo("ok");
+        assertThat(details).isEqualTo("Successfully disabled permission2 for user: " + testUser.getUsername());
+        assertThat(user.isPermission2()).isFalse();
+    }
+
     private void assertInternalThingsKeptInternal(ResponseBodyGetUsers usersResponse){
         assertThat(usersResponse.getUsers().get(0).getId()).isNull();
         assertThat(usersResponse.getUsers().get(0).getMasterKey()).isNull();
@@ -229,7 +265,7 @@ public class AdminUserControllerTest {
 
     private void createUser() {
         String loginHashHash = Bcrypt.hash(LOGIN_HASH);
-        testUser = new UserEntity("admin", "", "salt", loginHashHash, "masterKey");
+        testUser = new UserEntity("admin", "", "salt", loginHashHash, "masterKey", false);
         testUser.setInit(false);
         testUser.setReset(false);
         userRepository.save(testUser);

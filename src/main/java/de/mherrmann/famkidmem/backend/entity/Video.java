@@ -20,6 +20,7 @@ public class Video {
     private int durationInSeconds;
     private boolean recordedInCologne;
     private boolean recordedInGardelegen;
+    private boolean permission2;
     private int showDateValues;
 
     private Timestamp timestamp;
@@ -52,7 +53,8 @@ public class Video {
 
     public Video(
             String title, String description, int durationInSeconds, boolean recordedInCologne, boolean recordedInGardelegen,
-            List<Year> years, List<Person> persons, Key key, FileEntity thumbnail, FileEntity m3u8, int showDateValues, Timestamp timestamp) {
+            List<Year> years, List<Person> persons, Key key, FileEntity thumbnail,
+            FileEntity m3u8, int showDateValues, Timestamp timestamp, boolean permission2) {
         this.id = UUID.randomUUID().toString();
         this.title = title;
         this.description = description;
@@ -66,6 +68,7 @@ public class Video {
         this.m3u8 = m3u8;
         setShowDateValues(showDateValues);
         this.timestamp = timestamp;
+        this.permission2 = permission2;
     }
 
     @JsonIgnore
@@ -171,5 +174,13 @@ public class Video {
 
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public boolean isPermission2() {
+        return permission2;
+    }
+
+    public void setPermission2(boolean permission2) {
+        this.permission2 = permission2;
     }
 }

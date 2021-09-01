@@ -47,7 +47,7 @@ public class VideoService {
     public ResponseBodyContentIndex getIndex(String accessToken) throws SecurityException {
         UserEntity user = userService.getUser(accessToken, "get video index");
         LOGGER.info("Successfully got video index. AccessToken: {}", accessToken);
-        return new ResponseBodyContentIndex(user.getMasterKey(), getVideos(), getPersons(), getYears());
+        return new ResponseBodyContentIndex(user.getMasterKey(), getVideos(user), getPersons(), getYears());
     }
 
     public ResponseBodyContentFileBase64 getFileBase64(String accessToken, String filename) throws SecurityException, FileNotFoundException, IOException {
@@ -63,9 +63,14 @@ public class VideoService {
         return responseEntity;
     }
 
-    private List<Video> getVideos(){
+    private List<Video> getVideos(UserEntity user){
         List<Video> videos = new ArrayList<>();
-        Iterable<Video> videoIterable = videoRepository.findAllByOrderByTimestamp();
+        Iterable<Video> videoIterable;
+        if(user.isPermission2()){
+            videoIterable = videoRepository.findAllByOrderByTimestamp();
+        } else {
+            videoIterable = videoRepository.findAllByPermission2IsFalseOrderByTimestamp();
+        }
         videoIterable.forEach(videos::add);
         return videos;
     }
