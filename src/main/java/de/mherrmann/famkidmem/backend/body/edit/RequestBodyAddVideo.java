@@ -21,6 +21,7 @@ public class RequestBodyAddVideo {
     private String m3u8Iv;
     private int showDateValues;
     private long timestamp;
+    private boolean permission2;
 
     public String getTitle() {
         return title;
@@ -156,5 +157,13 @@ public class RequestBodyAddVideo {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public boolean isPermission2() {
+        return permission2;
+    }
+
+    public void setPermission2(boolean permission2) {
+        this.permission2 = permission2;
     }
 }
