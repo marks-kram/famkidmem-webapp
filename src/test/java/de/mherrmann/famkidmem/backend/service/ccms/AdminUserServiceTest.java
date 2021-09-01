@@ -169,6 +169,40 @@ public class AdminUserServiceTest {
         assertThat(usersResponse.getUsers().get(0).getUsername()).isEqualTo(testUser.getUsername());
     }
 
+    @Test
+    public void shouldSetPermission2_enable(){
+        testUser.setPermission2(false);
+        userRepository.save(testUser);
+        Exception exception = null;
+
+        try {
+            adminUserService.setPermission2(testUser.getUsername(), true);
+        } catch (Exception ex){
+            exception = ex;
+        }
+
+        UserEntity user = userRepository.findByUsername(testUser.getUsername()).get();
+        assertThat(exception).isNull();
+        assertThat(user.isPermission2()).isTrue();
+    }
+
+    @Test
+    public void shouldSetPermission2_disable(){
+        testUser.setPermission2(true);
+        userRepository.save(testUser);
+        Exception exception = null;
+
+        try {
+            adminUserService.setPermission2(testUser.getUsername(), false);
+        } catch (Exception ex){
+            exception = ex;
+        }
+
+        UserEntity user = userRepository.findByUsername(testUser.getUsername()).get();
+        assertThat(exception).isNull();
+        assertThat(user.isPermission2()).isFalse();
+    }
+
     private void shouldFailAddUser(RequestBodyAddUser addUserRequest){
         long countBefore = userRepository.count();
         Exception exception = null;
@@ -200,7 +234,7 @@ public class AdminUserServiceTest {
 
     private void createUser() {
         String loginHashHash = Bcrypt.hash(LOGIN_HASH);
-        testUser = new UserEntity("username", "displayName", "salt", loginHashHash, "masterKey");
+        testUser = new UserEntity("username", "displayName", "salt", loginHashHash, "masterKey", false);
         testUser.setInit(false);
         testUser.setReset(false);
         userRepository.save(testUser);

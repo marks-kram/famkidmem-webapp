@@ -62,7 +62,7 @@ public class TestUtils {
 
     public UserEntity createTestUser(String loginHash) {
         String loginHashHash = Bcrypt.hash(loginHash);
-        UserEntity testUser = new UserEntity("username", "", "salt", loginHashHash, "masterKey");
+        UserEntity testUser = new UserEntity("username", "", "salt", loginHashHash, "masterKey", false);
         testUser.setInit(true);
         testUser.setReset(true);
         testUser.setMasterKey("masterKey");

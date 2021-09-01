@@ -60,4 +60,24 @@ public class AdminUserController {
             return ResponseEntity.badRequest().body(new ResponseBody("error", ex.getMessage(), ex));
         }
     }
+
+    @PostMapping(value = "/enablePermission2/{username}")
+    public ResponseEntity<ResponseBody> enablePermission2(@PathVariable String username){
+        try {
+            adminUserService.setPermission2(username, true);
+            return ResponseEntity.ok(new ResponseBody("ok", "Successfully enabled permission2 for user: " + username));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(new ResponseBody("error", ex.getMessage(), ex));
+        }
+    }
+
+    @PostMapping(value = "/disablePermission2/{username}")
+    public ResponseEntity<ResponseBody> disablePermission2(@PathVariable String username){
+        try {
+            adminUserService.setPermission2(username, false);
+            return ResponseEntity.ok(new ResponseBody("ok", "Successfully disabled permission2 for user: " + username));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(new ResponseBody("error", ex.getMessage(), ex));
+        }
+    }
 }
