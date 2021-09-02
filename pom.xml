@@ -15,7 +15,7 @@
     <groupId>de.mherrmann.famkidmem</groupId>
     <artifactId>famkidmem-web-backend</artifactId>
     <description>Web-Backend for Family Kid Memories (Online version for 'selbstgedrehte videos')</description>
-    <version>1.1</version>
+    <version>1.2</version>
 
     <properties>
         <swaggerversion>2.9.2</swaggerversion>

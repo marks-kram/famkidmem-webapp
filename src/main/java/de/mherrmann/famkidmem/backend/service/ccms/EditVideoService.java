@@ -121,7 +121,8 @@ public class EditVideoService {
                 thumbnail,
                 m3u8,
                 addVideoRequest.getShowDateValues(),
-                new Timestamp(addVideoRequest.getTimestamp())
+                new Timestamp(addVideoRequest.getTimestamp()),
+                addVideoRequest.isPermission2()
         );
         videoRepository.save(video);
     }
@@ -139,6 +140,7 @@ public class EditVideoService {
         List<Year> yearsBefore = video.getYears();
         video.setYears(getYears(updateVideoRequest.getYears()));
         video.setPersons(getPersons(updateVideoRequest.getPersons()));
+        video.setPermission2(updateVideoRequest.isPermission2());
         videoRepository.save(video);
         personsBefore.forEach(this::deletePersonIfOrphan);
         yearsBefore.forEach(this::deleteYearIfOrphan);

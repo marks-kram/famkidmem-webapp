@@ -16,18 +16,22 @@ public class UserEntity {
     private String loginHashHash;
     private String masterKey;
 
+    private boolean permission2;
+
     private boolean init; //indicates the user has to change username and password after login
     private boolean reset; //indicates the user has to change password after login
 
     protected UserEntity(){}
 
-    public UserEntity(String username, String displayName, String passwordKeySalt, String loginHashHash, String masterKey) {
+    public UserEntity(String username, String displayName, String passwordKeySalt, String loginHashHash,
+                      String masterKey, boolean permission2) {
         this.id = UUID.randomUUID().toString();
         this.username = username;
         this.displayName = displayName;
         this.passwordKeySalt = passwordKeySalt;
         this.loginHashHash = loginHashHash;
         this.masterKey = masterKey;
+        this.permission2 = permission2;
     }
 
     @JsonIgnore
@@ -80,6 +84,14 @@ public class UserEntity {
 
     public void setMasterKey(String masterKey) {
         this.masterKey = masterKey;
+    }
+
+    public boolean isPermission2() {
+        return permission2;
+    }
+
+    public void setPermission2(boolean permission2) {
+        this.permission2 = permission2;
     }
 
     public boolean isInit() {

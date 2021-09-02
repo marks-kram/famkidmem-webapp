@@ -138,7 +138,7 @@ public class VideoControllerTest {
 
 
     private void createTestUser() {
-        testUser = testUtils.createTestUser(LOGIN_HASH);
+        testUser = testUtils.createTestUser(LOGIN_HASH, true);
     }
 
     private static ResponseBodyContentIndex jsonToLoginResponseContentIndex(final String json) {

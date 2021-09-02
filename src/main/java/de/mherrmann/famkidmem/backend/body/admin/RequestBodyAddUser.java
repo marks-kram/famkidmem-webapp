@@ -7,6 +7,7 @@ public class RequestBodyAddUser {
     private String loginHash;
     private String passwordKeySalt;
     private String masterKey;
+    private boolean permission2;
 
     public String getUsername() {
         return username;
@@ -46,5 +47,13 @@ public class RequestBodyAddUser {
 
     public void setMasterKey(String masterKey) {
         this.masterKey = masterKey;
+    }
+
+    public boolean isPermission2() {
+        return permission2;
+    }
+
+    public void setPermission2(boolean permission2) {
+        this.permission2 = permission2;
     }
 }

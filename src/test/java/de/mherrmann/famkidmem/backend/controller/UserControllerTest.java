@@ -308,7 +308,7 @@ public class UserControllerTest {
 
     private void createTestUser() {
         String loginHashHash = Bcrypt.hash(LOGIN_HASH);
-        testUser = new UserEntity("username", "displayName","salt", loginHashHash, "masterKey");
+        testUser = new UserEntity("username", "displayName","salt", loginHashHash, "masterKey", false);
         userRepository.save(testUser);
     }
 
