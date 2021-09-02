@@ -20,3 +20,11 @@ jobs:
           fileName=$(basename $(ls ./target/*.jar))
           cp ./target/$fileName /opt/webapps/family-moments/devel/$fileName
           ln -sf /opt/webapps/family-moments/devel/$fileName /opt/webapps/family-moments/devel/family-moments.jar
+  deploy-code:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      - name: deploy_code
+        run: |
+          zip -r server-source.zip ./ -x 'server-source.zip' -x '.github' -x '.gitignore' -x '.git'
+          cp ./server-source.zip /var/www/devel.family-moments.media/server-source.zip
