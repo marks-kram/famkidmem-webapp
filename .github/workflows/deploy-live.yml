@@ -1,0 +1,31 @@
+name: deploy-live
+on:
+  push:
+    branches:
+      - live
+jobs:
+  test:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      - run: mvn clean test
+  build-and-deploy:
+    needs: test
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      - name: build_and_deploy
+        run: |
+          mvn clean package -DskipTests
+          fileName=$(basename $(ls ./target/*.jar))
+          cp ./target/$fileName /opt/webapps/family-moments/live/$fileName
+          ln -sf /opt/webapps/family-moments/live/$fileName /opt/webapps/family-moments/live/family-moments.jar
+          touch /opt/webapps/family-moments/live/restart
+  deploy-code:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      - name: deploy_code
+        run: |
+          zip -r server-source.zip ./ -x '*server-source.zip*' -x '*.github*' -x '*.gitignore*' -x '*.git*'
+          cp ./server-source.zip /var/www/family-moments.media/server-source.zip

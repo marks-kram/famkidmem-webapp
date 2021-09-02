@@ -28,12 +28,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 public class VideoServiceTest {
 
-    private static final String LOGIN_HASH = "loginHash";
+    private static final String LOGIN_HASH_NO_PERMISSION_2 = "loginHash";
+    private static final String LOGIN_HASH_PERMISSION_2 = "loginHashWithPermission2";
     private static final String THUMBNAIL_BASE64 = "dGh1bWJuYWls";
     private static final String M3U8_BASE64 = "bTN1OA==";
 
     private UserEntity testUser;
-    private ResponseBodyLogin testLogin;
+    private ResponseBodyLogin testLoginNoPermission2;
+    private ResponseBodyLogin testLoginPermission2;
 
     @Autowired
     private UserService userService;
@@ -51,8 +53,7 @@ public class VideoServiceTest {
     public void setup() throws Exception {
         editVideoService.addVideo(testUtils.createAddVideoRequest());
         editVideoService.addVideo(testUtils.createAddAnotherVideoRequest());
-        createTestUser();
-        testLogin  = userService.login(testUser.getUsername(), LOGIN_HASH, true);
+        prepareTest();
         testUtils.createTestFile("sequence.ts");
     }
 
@@ -64,18 +65,33 @@ public class VideoServiceTest {
     }
 
     @Test
-    public void shouldGetIndex(){
+    public void shouldGetIndex_NoPermission2(){
         Exception exception = null;
         ResponseBodyContentIndex contentIndex = null;
 
         try {
-            contentIndex = videoService.getIndex(testLogin.getAccessToken());
+            contentIndex = videoService.getIndex(testLoginNoPermission2.getAccessToken());
         } catch(Exception ex){
             exception = ex;
         }
 
         assertThat(exception).isNull();
-        assertIndex(contentIndex);
+        assertIndex(contentIndex, false);
+    }
+
+    @Test
+    public void shouldGetIndex_Permission2(){
+        Exception exception = null;
+        ResponseBodyContentIndex contentIndex = null;
+
+        try {
+            contentIndex = videoService.getIndex(testLoginPermission2.getAccessToken());
+        } catch(Exception ex){
+            exception = ex;
+        }
+
+        assertThat(exception).isNull();
+        assertIndex(contentIndex, true);
     }
 
     @Test
@@ -85,7 +101,7 @@ public class VideoServiceTest {
         prepareOrderTest();
 
         try {
-            contentIndex = videoService.getIndex(testLogin.getAccessToken());
+            contentIndex = videoService.getIndex(testLoginNoPermission2.getAccessToken());
         } catch(Exception ex){
             exception = ex;
         }
@@ -125,7 +141,7 @@ public class VideoServiceTest {
 
     @Test
     public void shouldFailGetFileBase64CausedByFileNotFound(){
-        shouldFailGetFileBase64(testLogin.getAccessToken(), "invalid", FileNotFoundException.class);
+        shouldFailGetFileBase64(testLoginNoPermission2.getAccessToken(), "invalid", FileNotFoundException.class);
     }
 
     @Test
@@ -134,7 +150,7 @@ public class VideoServiceTest {
         ResponseEntity response = null;
 
         try {
-            response = videoService.getTsFile(testLogin.getAccessToken(), "sequence.ts");
+            response = videoService.getTsFile(testLoginNoPermission2.getAccessToken(), "sequence.ts");
         } catch(Exception ex){
             exception = ex;
         }
@@ -153,14 +169,16 @@ public class VideoServiceTest {
 
     @Test
     public void shouldFailGetTsFileCausedByFileNotFound(){
-        shouldFailGetTsFile(testLogin.getAccessToken(), "invalid.ts", FileNotFoundException.class);
+        shouldFailGetTsFile(testLoginNoPermission2.getAccessToken(), "invalid.ts", FileNotFoundException.class);
     }
 
-    private void assertIndex(ResponseBodyContentIndex contentIndex){
+    private void assertIndex(ResponseBodyContentIndex contentIndex, boolean userHasPermission2){
         assertThat(contentIndex).isNotNull();
-        assertThat(contentIndex.getVideos().size()).isEqualTo(2);
+        assertThat(contentIndex.getVideos().size()).isEqualTo(userHasPermission2 ? 2 : 1);
         assertThat(contentIndex.getVideos().get(0).getTitle()).isEqualTo("title");
-        assertThat(contentIndex.getVideos().get(1).getTitle()).isEqualTo("video2");
+        if(userHasPermission2){
+            assertThat(contentIndex.getVideos().get(1).getTitle()).isEqualTo("video2");
+        }
         assertThat(contentIndex.getPersons().size()).isEqualTo(4);
         assertThat(contentIndex.getPersons().get(0)).isEqualTo("person1");
         assertThat(contentIndex.getPersons().get(1)).isEqualTo("person2");
@@ -198,7 +216,7 @@ public class VideoServiceTest {
         ResponseBodyContentFileBase64 content = null;
 
         try {
-            content = videoService.getFileBase64(testLogin.getAccessToken(), filename);
+            content = videoService.getFileBase64(testLoginNoPermission2.getAccessToken(), filename);
         } catch(Exception ex){
             exception = ex;
         }
@@ -234,8 +252,11 @@ public class VideoServiceTest {
         assertThat(exception).isInstanceOf(exceptionClass);
     }
 
-    private void createTestUser() {
-        testUser = testUtils.createTestUser(LOGIN_HASH);
+    private void prepareTest() {
+        testUser = testUtils.createTestUser(LOGIN_HASH_NO_PERMISSION_2, false);
+        UserEntity user = testUtils.createTestUser(LOGIN_HASH_PERMISSION_2, true);
+        testLoginNoPermission2 = userService.login(testUser.getUsername(), LOGIN_HASH_NO_PERMISSION_2, true);
+        testLoginPermission2 = userService.login(user.getUsername(), LOGIN_HASH_PERMISSION_2, true);
     }
 
     private void prepareOrderTest(){

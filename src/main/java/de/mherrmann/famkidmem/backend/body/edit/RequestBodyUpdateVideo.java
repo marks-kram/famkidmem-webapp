@@ -17,6 +17,7 @@ public class RequestBodyUpdateVideo {
     private String thumbnailIv;
     private int showDateValues;
     private long timestamp;
+    private boolean permission2;
 
     public String getDesignator() {
         return designator;
@@ -120,5 +121,13 @@ public class RequestBodyUpdateVideo {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public boolean isPermission2() {
+        return permission2;
+    }
+
+    public void setPermission2(boolean permission2) {
+        this.permission2 = permission2;
     }
 }

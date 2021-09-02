@@ -42,7 +42,7 @@ public class AdminUserService {
             throw new AddEntityException("Could not add user. Invalid username " + username);
         }
         UserEntity user = new UserEntity(addUserRequest.getUsername(), addUserRequest.getDisplayName(), addUserRequest.getPasswordKeySalt(), loginHashHash,
-                addUserRequest.getMasterKey());
+                addUserRequest.getMasterKey(), addUserRequest.isPermission2());
         user.setInit(true);
         userRepository.save(user);
         LOGGER.info("Successfully added user {}", addUserRequest.getUsername());
@@ -57,7 +57,7 @@ public class AdminUserService {
 
     public ResponseBodyGetUsers getUsers() {
         List<UserEntity> users = new ArrayList<>();
-        Iterable<UserEntity> userEntities = userRepository.findAll();
+        Iterable<UserEntity> userEntities = userRepository.findAllByOrderById();
         userEntities.forEach(users::add);
         ResponseBodyGetUsers usersResponse = new ResponseBodyGetUsers(users);
         LOGGER.info("Successfully got users");
@@ -72,6 +72,13 @@ public class AdminUserService {
         user.setReset(true);
         userRepository.save(user);
         LOGGER.info("Successfully reset password for user {}", resetPasswordRequest.getUsername());
+    }
+
+    public void setPermission2(String username, boolean permission2) throws EntityNotFoundException {
+        UserEntity user = getUser(username);
+        user.setPermission2(permission2);
+        userRepository.save(user);
+        LOGGER.info("Successfully set permission2 {} for user {}", permission2, username);
     }
 
     private void doChecks(RequestBodyAddUser addUserRequest) throws AddEntityException {
