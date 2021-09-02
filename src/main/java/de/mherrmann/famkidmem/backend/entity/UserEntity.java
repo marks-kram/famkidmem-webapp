@@ -86,7 +86,6 @@ public class UserEntity {
         this.masterKey = masterKey;
     }
 
-    @JsonIgnore
     public boolean isPermission2() {
         return permission2;
     }
