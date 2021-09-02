@@ -57,7 +57,7 @@ public class AdminUserService {
 
     public ResponseBodyGetUsers getUsers() {
         List<UserEntity> users = new ArrayList<>();
-        Iterable<UserEntity> userEntities = userRepository.findAll();
+        Iterable<UserEntity> userEntities = userRepository.findAllByOrderById();
         userEntities.forEach(users::add);
         ResponseBodyGetUsers usersResponse = new ResponseBodyGetUsers(users);
         LOGGER.info("Successfully got users");
