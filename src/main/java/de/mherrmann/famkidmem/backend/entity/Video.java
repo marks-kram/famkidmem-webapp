@@ -176,6 +176,7 @@ public class Video {
         this.timestamp = timestamp;
     }
 
+    @JsonIgnore
     public boolean isPermission2() {
         return permission2;
     }
