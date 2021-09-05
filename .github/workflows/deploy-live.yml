@@ -20,7 +20,7 @@ jobs:
           fileName=$(basename $(ls ./target/*.jar))
           cp ./target/$fileName /opt/webapps/family-moments/live/$fileName
           ln -sf /opt/webapps/family-moments/live/$fileName /opt/webapps/family-moments/live/family-moments.jar
-          touch /opt/webapps/family-moments/live/restart
+          echo "$(date)" > /opt/webapps/family-moments/live/restarted
   deploy-code:
     runs-on: self-hosted
     steps:
