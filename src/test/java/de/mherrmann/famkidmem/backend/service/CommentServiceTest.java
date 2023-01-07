@@ -2,6 +2,7 @@ package de.mherrmann.famkidmem.backend.service;
 
 import de.mherrmann.famkidmem.backend.TestUtils;
 import de.mherrmann.famkidmem.backend.body.AddCommentRequest;
+import de.mherrmann.famkidmem.backend.body.RemoveCommentRequest;
 import de.mherrmann.famkidmem.backend.body.UpdateCommentRequest;
 import de.mherrmann.famkidmem.backend.body.edit.RequestBodyAddVideo;
 import de.mherrmann.famkidmem.backend.entity.Comment;
@@ -126,6 +127,22 @@ public class CommentServiceTest {
         assertThat(comment.isModified()).isTrue();
     }
 
+    @Test
+    public void shouldDeleteComment() throws Exception {
+        RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest();
+        AddCommentRequest addCommentRequest1 = createAddCommentRequest();
+        AddCommentRequest addCommentRequest2 = createAddCommentRequest();
+        addCommentRequest2.setText("other");
+        commentService.addComment(addCommentRequest1, user);
+        commentService.addComment(addCommentRequest2, user);
+
+        commentService.removeComment(removeCommentRequest, user);
+        assertThat(commentRepository.count()).isEqualTo(1);
+        assertThat(commentRepository.findAll().iterator()).hasNext();
+        Comment comment = commentRepository.findAll().iterator().next();
+        assertThat(comment.getText()).isEqualTo(addCommentRequest2.getText());
+    }
+
     private AddCommentRequest createAddCommentRequest () {
         AddCommentRequest addCommentRequest = new AddCommentRequest();
         addCommentRequest.setText("test");
@@ -142,5 +159,13 @@ public class CommentServiceTest {
         updateCommentRequest.setVideoTitle(video.getTitle());
         return updateCommentRequest;
     }
+
+    private RemoveCommentRequest createRemoveCommentRequest () {
+        RemoveCommentRequest removeCommentRequest = new RemoveCommentRequest();
+        removeCommentRequest.setText("test");
+        removeCommentRequest.setVideoTitle(video.getTitle());
+        return removeCommentRequest;
+    }
+
 
 }

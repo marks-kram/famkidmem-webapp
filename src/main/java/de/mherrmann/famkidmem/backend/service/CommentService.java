@@ -1,6 +1,7 @@
 package de.mherrmann.famkidmem.backend.service;
 
 import de.mherrmann.famkidmem.backend.body.AddCommentRequest;
+import de.mherrmann.famkidmem.backend.body.RemoveCommentRequest;
 import de.mherrmann.famkidmem.backend.body.UpdateCommentRequest;
 import de.mherrmann.famkidmem.backend.entity.Comment;
 import de.mherrmann.famkidmem.backend.entity.Key;
@@ -86,5 +87,17 @@ public class CommentService {
         comment.setModifiedTrue();
         comment.setModificationToNow();
         commentRepository.save(comment);
+    }
+
+    public void removeComment (RemoveCommentRequest removeCommentRequest, UserEntity user) throws EntityNotFoundException {
+        String videoTitle = removeCommentRequest.getVideoTitle();
+        Optional<Video> videoOptional = videoRepository.findByTitle(videoTitle);
+
+        if (!videoOptional.isPresent()) {
+            LOGGER.error("Could not update comment for Video. Video not found. title: {}", videoTitle);
+            throw new EntityNotFoundException(Video.class, videoTitle);
+        }
+
+        commentRepository.deleteByVideoAndUserAndText(videoOptional.get(), user, removeCommentRequest.getText());
     }
 }
