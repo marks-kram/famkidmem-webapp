@@ -143,6 +143,123 @@ public class CommentServiceTest {
         assertThat(comment.getText()).isEqualTo(addCommentRequest2.getText());
     }
 
+
+    @Test
+    public void shouldThrowExceptionDueToMissingVideoOnAddComment() {
+        AddCommentRequest addCommentRequest = createAddCommentRequest();
+        addCommentRequest.setVideoTitle("missing");
+        Exception exception = null;
+
+        try {
+            commentService.addComment(addCommentRequest, user);
+        } catch (Exception ex) {
+            exception = ex;
+        }
+
+        assertThat(exception).isNotNull().isInstanceOf(EntityNotFoundException.class).hasMessage(
+                new EntityNotFoundException(Video.class, addCommentRequest.getVideoTitle()).getMessage()
+        );
+        assertThat(commentRepository.count()).isEqualTo(0);
+    }
+
+    @Test
+    public void shouldThrowExceptionDueToMissingVideoOnGetComments() throws Exception {
+        AddCommentRequest addCommentRequest = createAddCommentRequest();
+        commentService.addComment(addCommentRequest, user);
+        Exception exception = null;
+
+        try {
+            commentService.getComments("missing");
+        } catch (Exception ex) {
+            exception = ex;
+        }
+
+        assertThat(exception).isNotNull().isInstanceOf(EntityNotFoundException.class).hasMessage(
+                new EntityNotFoundException(Video.class, "missing").getMessage()
+        );
+        assertThat(commentRepository.count()).isEqualTo(1);
+    }
+
+    @Test
+    public void shouldThrowExceptionDueToMissingVideoOnUpdateComment() throws Exception {
+        UpdateCommentRequest updateCommentRequest = createUpdateCommentRequest();
+        updateCommentRequest.setVideoTitle("missing");
+        AddCommentRequest addCommentRequest = createAddCommentRequest();
+        commentService.addComment(addCommentRequest, user);
+        Exception exception = null;
+
+        try {
+            commentService.updateComment(updateCommentRequest, user);
+        } catch (Exception ex) {
+            exception = ex;
+        }
+
+        assertThat(exception).isNotNull().isInstanceOf(EntityNotFoundException.class).hasMessage(
+                new EntityNotFoundException(Video.class, updateCommentRequest.getVideoTitle()).getMessage()
+        );
+        assertThat(commentRepository.count()).isEqualTo(1);
+    }
+
+    @Test
+    public void shouldThrowExceptionDueToMissingCommentOnUpdateComment() throws Exception {
+        UpdateCommentRequest updateCommentRequest = createUpdateCommentRequest();
+        updateCommentRequest.setOldText("missing");
+        AddCommentRequest addCommentRequest = createAddCommentRequest();
+        commentService.addComment(addCommentRequest, user);
+        Exception exception = null;
+
+        try {
+            commentService.updateComment(updateCommentRequest, user);
+        } catch (Exception ex) {
+            exception = ex;
+        }
+
+        assertThat(exception).isNotNull().isInstanceOf(EntityNotFoundException.class).hasMessage(
+                new EntityNotFoundException(Comment.class, updateCommentRequest.getOldText()).getMessage()
+        );
+        assertThat(commentRepository.count()).isEqualTo(1);
+    }
+
+    @Test
+    public void shouldThrowExceptionDueToMissingVideoOnRemoveComment() throws Exception {
+        RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest();
+        removeCommentRequest.setVideoTitle("missing");
+        AddCommentRequest addCommentRequest = createAddCommentRequest();
+        commentService.addComment(addCommentRequest, user);
+        Exception exception = null;
+
+        try {
+            commentService.removeComment(removeCommentRequest, user);
+        } catch (Exception ex) {
+            exception = ex;
+        }
+
+        assertThat(exception).isNotNull().isInstanceOf(EntityNotFoundException.class).hasMessage(
+                new EntityNotFoundException(Video.class, removeCommentRequest.getVideoTitle()).getMessage()
+        );
+        assertThat(commentRepository.count()).isEqualTo(1);
+    }
+
+    @Test
+    public void shouldThrowExceptionDueToMissingCommentOnRemoveComment() throws Exception {
+        RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest();
+        removeCommentRequest.setText("missing");
+        AddCommentRequest addCommentRequest = createAddCommentRequest();
+        commentService.addComment(addCommentRequest, user);
+        Exception exception = null;
+
+        try {
+            commentService.removeComment(removeCommentRequest, user);
+        } catch (Exception ex) {
+            exception = ex;
+        }
+
+        assertThat(exception).isNotNull().isInstanceOf(EntityNotFoundException.class).hasMessage(
+                new EntityNotFoundException(Comment.class, removeCommentRequest.getText()).getMessage()
+        );
+        assertThat(commentRepository.count()).isEqualTo(1);
+    }
+
     private AddCommentRequest createAddCommentRequest () {
         AddCommentRequest addCommentRequest = new AddCommentRequest();
         addCommentRequest.setText("test");

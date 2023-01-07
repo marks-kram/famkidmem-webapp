@@ -68,6 +68,21 @@ public class CommentService {
     public void updateComment(UpdateCommentRequest updateCommentRequest, UserEntity user) throws EntityNotFoundException {
         String videoTitle = updateCommentRequest.getVideoTitle();
         String oldText = updateCommentRequest.getOldText();
+        Comment comment = getComment(user, videoTitle, oldText);
+        comment.setText(updateCommentRequest.getText());
+        comment.setModifiedTrue();
+        comment.setModificationToNow();
+        commentRepository.save(comment);
+    }
+
+    public void removeComment (RemoveCommentRequest removeCommentRequest, UserEntity user) throws EntityNotFoundException {
+        String videoTitle = removeCommentRequest.getVideoTitle();
+        String text = removeCommentRequest.getText();
+        Comment comment = getComment(user, videoTitle, text);
+        commentRepository.delete(comment);
+    }
+
+    private Comment getComment(UserEntity user, String videoTitle, String oldText) throws EntityNotFoundException {
         Optional<Video> videoOptional = videoRepository.findByTitle(videoTitle);
 
         if (!videoOptional.isPresent()) {
@@ -79,25 +94,9 @@ public class CommentService {
 
         if (!commentOptional.isPresent()) {
             LOGGER.error("Could not update comment. Comment not found. video title: {}; old comment text: {}", videoTitle, oldText);
-            throw new EntityNotFoundException(Video.class, videoTitle);
+            throw new EntityNotFoundException(Comment.class, oldText);
         }
 
-        Comment comment = commentOptional.get();
-        comment.setText(updateCommentRequest.getText());
-        comment.setModifiedTrue();
-        comment.setModificationToNow();
-        commentRepository.save(comment);
-    }
-
-    public void removeComment (RemoveCommentRequest removeCommentRequest, UserEntity user) throws EntityNotFoundException {
-        String videoTitle = removeCommentRequest.getVideoTitle();
-        Optional<Video> videoOptional = videoRepository.findByTitle(videoTitle);
-
-        if (!videoOptional.isPresent()) {
-            LOGGER.error("Could not update comment for Video. Video not found. title: {}", videoTitle);
-            throw new EntityNotFoundException(Video.class, videoTitle);
-        }
-
-        commentRepository.deleteByVideoAndUserAndText(videoOptional.get(), user, removeCommentRequest.getText());
+        return commentOptional.get();
     }
 }
