@@ -1,5 +1,7 @@
 package de.mherrmann.famkidmem.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.UUID;
 
@@ -38,6 +40,7 @@ public class Comment {
         this.key = key;
     }
 
+    @JsonIgnore
     public String getId() {
         return id;
     }
@@ -62,6 +65,7 @@ public class Comment {
         return user;
     }
 
+    @JsonIgnore
     public Video getVideo() {
         return video;
     }

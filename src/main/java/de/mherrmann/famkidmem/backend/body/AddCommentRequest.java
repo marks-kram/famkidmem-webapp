@@ -1,12 +1,10 @@
 package de.mherrmann.famkidmem.backend.body;
 
-import de.mherrmann.famkidmem.backend.entity.UserEntity;
-
 public class AddCommentRequest {
     private String text;
     private String key;
     private String iv;
-    private String videoId;
+    private String videoTitle;
 
     public String getText() {
         return text;
@@ -32,11 +30,11 @@ public class AddCommentRequest {
         this.iv = iv;
     }
 
-    public String getVideoId() {
-        return videoId;
+    public String getVideoTitle() {
+        return videoTitle;
     }
 
-    public void setVideoId(String videoId) {
-        this.videoId = videoId;
+    public void setVideoTitle(String videoTitle) {
+        this.videoTitle = videoTitle;
     }
 }

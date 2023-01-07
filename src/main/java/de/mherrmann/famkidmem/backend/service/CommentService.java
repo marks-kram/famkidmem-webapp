@@ -32,12 +32,12 @@ public class CommentService {
     }
 
     public void addComment(AddCommentRequest addCommentRequest, UserEntity user) throws EntityNotFoundException {
-        String id = addCommentRequest.getVideoId();
-        Optional<Video> videoOptional = videoRepository.findById(id);
+        String videoTitle = addCommentRequest.getVideoTitle();
+        Optional<Video> videoOptional = videoRepository.findByTitle(videoTitle);
 
         if (!videoOptional.isPresent()) {
-            LOGGER.error("Could not add comment for Video. Video not found. id: {}", id);
-            throw new EntityNotFoundException(Video.class, id);
+            LOGGER.error("Could not add comment for Video. Video not found. title: {}", videoTitle);
+            throw new EntityNotFoundException(Video.class, videoTitle);
         }
 
         Key key = new Key(addCommentRequest.getKey(), addCommentRequest.getIv());

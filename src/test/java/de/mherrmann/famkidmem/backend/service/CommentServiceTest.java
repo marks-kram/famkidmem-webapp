@@ -75,7 +75,7 @@ public class CommentServiceTest {
         addCommentRequest.setText("test");
         addCommentRequest.setKey("key");
         addCommentRequest.setIv("iv");
-        addCommentRequest.setVideoId(video.getId());
+        addCommentRequest.setVideoTitle(video.getTitle());
         return addCommentRequest;
     }
 
