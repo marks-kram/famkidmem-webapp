@@ -2,6 +2,7 @@ package de.mherrmann.famkidmem.backend.service;
 
 import de.mherrmann.famkidmem.backend.TestUtils;
 import de.mherrmann.famkidmem.backend.body.AddCommentRequest;
+import de.mherrmann.famkidmem.backend.body.UpdateCommentRequest;
 import de.mherrmann.famkidmem.backend.body.edit.RequestBodyAddVideo;
 import de.mherrmann.famkidmem.backend.entity.Comment;
 import de.mherrmann.famkidmem.backend.entity.UserEntity;
@@ -110,6 +111,21 @@ public class CommentServiceTest {
         assertThat(comments).isEmpty();
     }
 
+    @Test
+    public void shouldUpdateComment() throws Exception {
+        UpdateCommentRequest updateCommentRequest = createUpdateCommentRequest();
+        AddCommentRequest addCommentRequest = createAddCommentRequest();
+        commentService.addComment(addCommentRequest, user);
+
+        commentService.updateComment(updateCommentRequest, user);
+
+        assertThat(commentRepository.count()).isEqualTo(1);
+        assertThat(commentRepository.findAll().iterator()).hasNext();
+        Comment comment = commentRepository.findAll().iterator().next();
+        assertThat(comment.getText()).isEqualTo(updateCommentRequest.getText());
+        assertThat(comment.isModified()).isTrue();
+    }
+
     private AddCommentRequest createAddCommentRequest () {
         AddCommentRequest addCommentRequest = new AddCommentRequest();
         addCommentRequest.setText("test");
@@ -117,6 +133,14 @@ public class CommentServiceTest {
         addCommentRequest.setIv("iv");
         addCommentRequest.setVideoTitle(video.getTitle());
         return addCommentRequest;
+    }
+
+    private UpdateCommentRequest createUpdateCommentRequest () {
+        UpdateCommentRequest updateCommentRequest = new UpdateCommentRequest();
+        updateCommentRequest.setText("updated");
+        updateCommentRequest.setOldText("test");
+        updateCommentRequest.setVideoTitle(video.getTitle());
+        return updateCommentRequest;
     }
 
 }

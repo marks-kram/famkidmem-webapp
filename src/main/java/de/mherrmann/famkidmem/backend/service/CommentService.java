@@ -1,6 +1,7 @@
 package de.mherrmann.famkidmem.backend.service;
 
 import de.mherrmann.famkidmem.backend.body.AddCommentRequest;
+import de.mherrmann.famkidmem.backend.body.UpdateCommentRequest;
 import de.mherrmann.famkidmem.backend.entity.Comment;
 import de.mherrmann.famkidmem.backend.entity.Key;
 import de.mherrmann.famkidmem.backend.entity.UserEntity;
@@ -61,5 +62,29 @@ public class CommentService {
         Iterable<Comment> commentIterable = commentRepository.findAllByVideo(videoOptional.get());
         commentIterable.forEach(comments::add);
         return comments;
+    }
+
+    public void updateComment(UpdateCommentRequest updateCommentRequest, UserEntity user) throws EntityNotFoundException {
+        String videoTitle = updateCommentRequest.getVideoTitle();
+        String oldText = updateCommentRequest.getOldText();
+        Optional<Video> videoOptional = videoRepository.findByTitle(videoTitle);
+
+        if (!videoOptional.isPresent()) {
+            LOGGER.error("Could not update comment for Video. Video not found. title: {}", videoTitle);
+            throw new EntityNotFoundException(Video.class, videoTitle);
+        }
+
+        Optional<Comment> commentOptional = commentRepository.findByVideoAndUserAndText(videoOptional.get(), user, oldText);
+
+        if (!commentOptional.isPresent()) {
+            LOGGER.error("Could not update comment. Comment not found. video title: {}; old comment text: {}", videoTitle, oldText);
+            throw new EntityNotFoundException(Video.class, videoTitle);
+        }
+
+        Comment comment = commentOptional.get();
+        comment.setText(updateCommentRequest.getText());
+        comment.setModifiedTrue();
+        comment.setModificationToNow();
+        commentRepository.save(comment);
     }
 }
