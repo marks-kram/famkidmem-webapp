@@ -37,10 +37,13 @@ public class TestUtils {
 
     @Autowired
     private VideoRepository videoRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
 
     public void dropAll() {
         sessionRepository.deleteAll();
+        commentRepository.deleteAll();
         userRepository.deleteAll();
         videoRepository.deleteAll();
         personRepository.deleteAll();
