@@ -2,6 +2,7 @@ package de.mherrmann.famkidmem.backend.service;
 
 import de.mherrmann.famkidmem.backend.TestUtils;
 import de.mherrmann.famkidmem.backend.body.AddCommentRequest;
+import de.mherrmann.famkidmem.backend.body.edit.RequestBodyAddVideo;
 import de.mherrmann.famkidmem.backend.entity.Comment;
 import de.mherrmann.famkidmem.backend.entity.UserEntity;
 import de.mherrmann.famkidmem.backend.entity.Video;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,6 +70,29 @@ public class CommentServiceTest {
         assertThat(comment.getText()).isEqualTo(addCommentRequest.getText());
         assertThat(comment.getUser().getUsername()).isEqualTo(user.getUsername());
         assertThat(comment.getVideo().getTitle()).isEqualTo(video.getTitle());
+    }
+
+    @Test
+    public void shouldGet2Comments() throws Exception {
+        RequestBodyAddVideo addVideoRequest = testUtils.createAddVideoRequest();
+        addVideoRequest.setTitle("another");
+        editVideoService.addVideo(addVideoRequest);
+        AddCommentRequest addCommentRequest1 = createAddCommentRequest();
+        AddCommentRequest addCommentRequest2 = createAddCommentRequest();
+        AddCommentRequest addCommentRequest3 = createAddCommentRequest();
+        addCommentRequest1.setText("text1");
+        addCommentRequest2.setText("text2");
+        addCommentRequest3.setText("text3");
+        addCommentRequest3.setVideoTitle("another");
+        commentService.addComment(addCommentRequest1, user);
+        commentService.addComment(addCommentRequest2, user);
+        commentService.addComment(addCommentRequest3, user);
+
+        List<Comment> comments = commentService.getComments(video.getTitle());
+
+        assertThat(comments).hasSize(2);
+        assertThat(comments.get(0).getText()).isEqualTo("text1");
+        assertThat(comments.get(1).getText()).isEqualTo("text2");
     }
 
     private AddCommentRequest createAddCommentRequest () {

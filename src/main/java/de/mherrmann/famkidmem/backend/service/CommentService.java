@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -45,5 +47,19 @@ public class CommentService {
 
         Comment comment = new Comment(addCommentRequest.getText(), user, videoOptional.get(), key);
         commentRepository.save(comment);
+    }
+
+    public List<Comment> getComments (String videoTitle) throws EntityNotFoundException {
+        Optional<Video> videoOptional = videoRepository.findByTitle(videoTitle);
+
+        if (!videoOptional.isPresent()) {
+            LOGGER.error("Could not add comment for Video. Video not found. title: {}", videoTitle);
+            throw new EntityNotFoundException(Video.class, videoTitle);
+        }
+
+        List<Comment> comments = new ArrayList<>();
+        Iterable<Comment> commentIterable = commentRepository.findAllByVideo(videoOptional.get());
+        commentIterable.forEach(comments::add);
+        return comments;
     }
 }
