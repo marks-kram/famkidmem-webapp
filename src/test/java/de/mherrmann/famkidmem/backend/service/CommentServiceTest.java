@@ -95,6 +95,21 @@ public class CommentServiceTest {
         assertThat(comments.get(1).getText()).isEqualTo("text2");
     }
 
+    @Test
+    public void shouldGetEmptyCommentsList() throws Exception {
+        RequestBodyAddVideo addVideoRequest = testUtils.createAddVideoRequest();
+        addVideoRequest.setTitle("another");
+        editVideoService.addVideo(addVideoRequest);
+        AddCommentRequest addCommentRequest = createAddCommentRequest();
+        addCommentRequest.setText("text1");
+        addCommentRequest.setVideoTitle("another");
+        commentService.addComment(addCommentRequest, user);
+
+        List<Comment> comments = commentService.getComments(video.getTitle());
+
+        assertThat(comments).isEmpty();
+    }
+
     private AddCommentRequest createAddCommentRequest () {
         AddCommentRequest addCommentRequest = new AddCommentRequest();
         addCommentRequest.setText("test");
