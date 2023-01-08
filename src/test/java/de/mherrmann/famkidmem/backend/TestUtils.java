@@ -42,11 +42,14 @@ public class TestUtils {
     private CommentRepository commentRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ChatMessageRepository chatMessageRepository;
 
 
     public void dropAll() {
         sessionRepository.deleteAll();
         commentRepository.deleteAll();
+        chatMessageRepository.deleteAll();
         userRepository.deleteAll();
         videoRepository.deleteAll();
         personRepository.deleteAll();
