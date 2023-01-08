@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
@@ -42,7 +44,7 @@ public class ChatServiceTest {
     }
 
     @Test
-    public void shouldAddComment() {
+    public void shouldAddMessage() {
         AddMessageRequest addMessageRequest = createAddMessageRequest();
 
         chatService.addMessage(addMessageRequest, user);
@@ -54,30 +56,36 @@ public class ChatServiceTest {
         assertThat(message.getUser().getUsername()).isEqualTo(user.getUsername());
     }
 
-   /* @Test
-    public void shouldGet2Comments() throws Exception {
-        RequestBodyAddVideo addVideoRequest = testUtils.createAddVideoRequest();
-        addVideoRequest.setTitle("another");
-        editVideoService.addVideo(addVideoRequest);
-        AddCommentRequest addCommentRequest1 = createAddMessageRequest();
-        AddCommentRequest addCommentRequest2 = createAddMessageRequest();
-        AddCommentRequest addCommentRequest3 = createAddMessageRequest();
-        addCommentRequest1.setText("text1");
-        addCommentRequest2.setText("text2");
-        addCommentRequest3.setText("text3");
-        addCommentRequest3.setVideoTitle("another");
-        chatService.addComment(addCommentRequest1, user);
-        chatService.addComment(addCommentRequest2, user);
-        chatService.addComment(addCommentRequest3, user);
+   @Test
+    public void shouldGet2Messages() {
+        AddMessageRequest addMessageRequest1 = createAddMessageRequest();
+        AddMessageRequest addMessageRequest2 = createAddMessageRequest();
+        addMessageRequest1.setMessage("text1");
+        addMessageRequest2.setMessage("text2");
+        chatService.addMessage(addMessageRequest1, user);
+        chatService.addMessage(addMessageRequest2, user);
 
-        List<Comment> comments = chatService.getComments(video.getTitle());
+        List<ChatMessage> messages = chatService.getAllMessages();
 
-        assertThat(comments).hasSize(2);
-        assertThat(comments.get(0).getText()).isEqualTo("text1");
-        assertThat(comments.get(1).getText()).isEqualTo("text2");
+        assertThat(messages).hasSize(2);
+        assertThat(messages.get(0).getMessage()).isEqualTo(addMessageRequest1.getMessage());
+        assertThat(messages.get(1).getMessage()).isEqualTo(addMessageRequest2.getMessage());
     }
 
     @Test
+    public void shouldGetTheNewMessage() {
+        AddMessageRequest addMessageRequest = createAddMessageRequest();
+        chatService.addMessage(addMessageRequest, user);
+
+        List<ChatMessage> messages1 = chatService.getMessagesSince(System.currentTimeMillis() - 2000);
+        List<ChatMessage> messages2 = chatService.getMessagesSince(System.currentTimeMillis() + 2000);
+
+        assertThat(messages1).hasSize(1);
+        assertThat(messages2).isEmpty();
+        assertThat(messages1.get(0).getMessage()).isEqualTo(addMessageRequest.getMessage());
+    }
+
+    /* @Test
     public void shouldGetEmptyCommentsList() throws Exception {
         RequestBodyAddVideo addVideoRequest = testUtils.createAddVideoRequest();
         addVideoRequest.setTitle("another");
