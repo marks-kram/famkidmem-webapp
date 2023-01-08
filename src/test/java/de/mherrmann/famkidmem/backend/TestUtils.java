@@ -5,6 +5,7 @@ import de.mherrmann.famkidmem.backend.body.edit.RequestBodyAddVideo;
 import de.mherrmann.famkidmem.backend.body.edit.RequestBodyUpdateVideo;
 import de.mherrmann.famkidmem.backend.entity.UserEntity;
 import de.mherrmann.famkidmem.backend.repository.*;
+import de.mherrmann.famkidmem.backend.service.UserService;
 import de.mherrmann.famkidmem.backend.utils.Bcrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,8 @@ public class TestUtils {
     private VideoRepository videoRepository;
     @Autowired
     private CommentRepository commentRepository;
+    @Autowired
+    private UserService userService;
 
 
     public void dropAll() {
@@ -74,6 +77,10 @@ public class TestUtils {
         testUser.setReset(true);
         testUser.setMasterKey("masterKey");
         return userRepository.save(testUser);
+    }
+
+    public String createUserSession(String userName, String loginHash) {
+        return userService.login(userName, loginHash, false).getAccessToken();
     }
 
     public RequestBodyAddUser createAddUserRequest() {
