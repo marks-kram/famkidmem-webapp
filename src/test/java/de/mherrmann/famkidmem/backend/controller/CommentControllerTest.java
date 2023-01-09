@@ -143,7 +143,8 @@ public class CommentControllerTest {
         assertThat(body.getMessage()).isEqualTo("success");
         assertThat(body.getDetails()).isEqualTo("comment removed");
         assertThat(body.getException()).isNull();
-        assertThat(commentRepository.count()).isEqualTo(0);
+        assertThat(commentRepository.findAll().iterator()).hasNext();
+        assertThat(commentRepository.findAll().iterator().next().isRemoved()).isTrue();
     }
 
 
@@ -209,7 +210,8 @@ public class CommentControllerTest {
         assertThat(body.getMessage()).isEqualTo("error");
         assertThat(body.getDetails()).isEqualTo("comment not removed");
         assertThat(body.getException()).isEqualTo(EntityNotFoundException.class.getSimpleName());
-        assertThat(commentRepository.count()).isEqualTo(1);
+        assertThat(commentRepository.findAll().iterator()).hasNext();
+        assertThat(commentRepository.findAll().iterator().next().isRemoved()).isFalse();
     }
 
     @Test
@@ -251,6 +253,9 @@ public class CommentControllerTest {
 
     @Test
     public void shouldFailToDeleteCommentDueToInvalidAccessToken() throws Exception {
+        AddCommentRequest addCommentRequest = createAddCommentRequest();
+        commentService.addComment(addCommentRequest, user);
+
         MvcResult mvcResult = this.mockMvc.perform(delete("/api/comment/delete/{accessToken}", "invalid")
                 .contentType("application/json")
                 .content(asJsonString(createRemoveCommentRequest()))
@@ -260,6 +265,8 @@ public class CommentControllerTest {
         assertThat(body.getMessage()).isEqualTo("error");
         assertThat(body.getDetails()).isEqualTo("comment not removed");
         assertThat(body.getException()).isEqualTo(SecurityException.class.getSimpleName());
+        assertThat(commentRepository.findAll().iterator()).hasNext();
+        assertThat(commentRepository.findAll().iterator().next().isRemoved()).isFalse();
     }
 
     private AddCommentRequest createAddCommentRequest () {

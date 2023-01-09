@@ -79,7 +79,10 @@ public class CommentService {
         String videoTitle = removeCommentRequest.getVideoTitle();
         String text = removeCommentRequest.getText();
         Comment comment = getComment(user, videoTitle, text);
-        commentRepository.delete(comment);
+        comment.setModificationToNow();
+        comment.setText(null);
+        comment.setRemovedTrue();
+        commentRepository.save(comment);
     }
 
     private Comment getComment(UserEntity user, String videoTitle, String oldText) throws EntityNotFoundException {

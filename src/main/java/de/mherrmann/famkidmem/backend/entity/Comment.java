@@ -14,6 +14,7 @@ public class Comment {
     private long creation;
     private long modification;
     private boolean modified;
+    private boolean removed;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -34,7 +35,6 @@ public class Comment {
         this.text = text;
         this.creation = System.currentTimeMillis();
         this.modification = -1L;
-        this.modified = false;
         this.user = user;
         this.video = video;
         this.key = key;
@@ -74,6 +74,10 @@ public class Comment {
         return key;
     }
 
+    public boolean isRemoved() {
+        return removed;
+    }
+
     public void setText(String text) {
         this.text = text;
     }
@@ -88,5 +92,9 @@ public class Comment {
 
     public void setKey(Key key) {
         this.key = key;
+    }
+
+    public void setRemovedTrue() {
+        this.removed = true;
     }
 }

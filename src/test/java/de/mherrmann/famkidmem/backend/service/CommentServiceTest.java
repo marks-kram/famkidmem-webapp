@@ -72,6 +72,7 @@ public class CommentServiceTest {
         assertThat(comment.getText()).isEqualTo(addCommentRequest.getText());
         assertThat(comment.getUser().getUsername()).isEqualTo(user.getUsername());
         assertThat(comment.getVideo().getTitle()).isEqualTo(video.getTitle());
+        assertThat(comment.isRemoved()).isFalse();
     }
 
     @Test
@@ -125,22 +126,21 @@ public class CommentServiceTest {
         Comment comment = commentRepository.findAll().iterator().next();
         assertThat(comment.getText()).isEqualTo(updateCommentRequest.getText());
         assertThat(comment.isModified()).isTrue();
+        assertThat(comment.isRemoved()).isFalse();
     }
 
     @Test
     public void shouldDeleteComment() throws Exception {
         RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest();
-        AddCommentRequest addCommentRequest1 = createAddCommentRequest();
-        AddCommentRequest addCommentRequest2 = createAddCommentRequest();
-        addCommentRequest2.setText("other");
-        commentService.addComment(addCommentRequest1, user);
-        commentService.addComment(addCommentRequest2, user);
+        AddCommentRequest addCommentRequest = createAddCommentRequest();
+        commentService.addComment(addCommentRequest, user);
 
         commentService.removeComment(removeCommentRequest, user);
         assertThat(commentRepository.count()).isEqualTo(1);
         assertThat(commentRepository.findAll().iterator()).hasNext();
         Comment comment = commentRepository.findAll().iterator().next();
-        assertThat(comment.getText()).isEqualTo(addCommentRequest2.getText());
+        assertThat(comment.getText()).isNull();
+        assertThat(comment.isRemoved()).isTrue();
     }
 
 
@@ -237,7 +237,8 @@ public class CommentServiceTest {
         assertThat(exception).isNotNull().isInstanceOf(EntityNotFoundException.class).hasMessage(
                 new EntityNotFoundException(Video.class, removeCommentRequest.getVideoTitle()).getMessage()
         );
-        assertThat(commentRepository.count()).isEqualTo(1);
+        assertThat(commentRepository.findAll().iterator()).hasNext();
+        assertThat(commentRepository.findAll().iterator().next().isRemoved()).isFalse();
     }
 
     @Test
@@ -257,7 +258,8 @@ public class CommentServiceTest {
         assertThat(exception).isNotNull().isInstanceOf(EntityNotFoundException.class).hasMessage(
                 new EntityNotFoundException(Comment.class, removeCommentRequest.getText()).getMessage()
         );
-        assertThat(commentRepository.count()).isEqualTo(1);
+        assertThat(commentRepository.findAll().iterator()).hasNext();
+        assertThat(commentRepository.findAll().iterator().next().isRemoved()).isFalse();
     }
 
     private AddCommentRequest createAddCommentRequest () {
