@@ -57,7 +57,7 @@ public class CommentService {
         Optional<Video> videoOptional = videoRepository.findByTitle(videoTitle);
 
         if (!videoOptional.isPresent()) {
-            LOGGER.error("Could not add comment for Video. Video not found. title: {}", videoTitle);
+            LOGGER.error("Could not get comments for Video. Video not found. title: {}", videoTitle);
             throw new EntityNotFoundException(Video.class, videoTitle);
         }
 
@@ -91,14 +91,14 @@ public class CommentService {
         Optional<Video> videoOptional = videoRepository.findByTitle(videoTitle);
 
         if (!videoOptional.isPresent()) {
-            LOGGER.error("Could not update comment for Video. Video not found. title: {}", videoTitle);
+            LOGGER.error("Could not update comment or remove for Video. Video not found. title: {}", videoTitle);
             throw new EntityNotFoundException(Video.class, videoTitle);
         }
 
         Optional<Comment> commentOptional = commentRepository.findByVideoAndUserAndCid(videoOptional.get(), user, cid);
 
         if (!commentOptional.isPresent()) {
-            LOGGER.error("Could not update comment. Comment not found. video title: {}; cid: {}", videoTitle, cid);
+            LOGGER.error("Could not update or remove comment. Comment not found. video title: {}; cid: {}", videoTitle, cid);
             throw new EntityNotFoundException(Comment.class, cid);
         }
 
