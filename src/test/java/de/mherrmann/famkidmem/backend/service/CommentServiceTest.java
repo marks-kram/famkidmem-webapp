@@ -78,7 +78,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    public void shouldGet2Comments() throws Exception {
+    public void shouldGet2CommentsOrdered() throws Exception {
         RequestBodyAddVideo addVideoRequest = testUtils.createAddVideoRequest();
         addVideoRequest.setTitle("another");
         editVideoService.addVideo(addVideoRequest);
@@ -96,8 +96,8 @@ public class CommentServiceTest {
         List<Comment> comments = commentService.getComments(ConversionUtil.base64ToBase64url(video.getTitle()));
 
         assertThat(comments).hasSize(2);
-        assertThat(comments.get(0).getText()).isEqualTo("text1");
-        assertThat(comments.get(1).getText()).isEqualTo("text2");
+        assertThat(comments.get(0).getText()).isEqualTo("text2");
+        assertThat(comments.get(1).getText()).isEqualTo("text1");
     }
 
     @Test

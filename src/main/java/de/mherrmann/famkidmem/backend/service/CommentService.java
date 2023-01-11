@@ -62,7 +62,7 @@ public class CommentService {
         }
 
         List<Comment> comments = new ArrayList<>();
-        Iterable<Comment> commentIterable = commentRepository.findAllByVideo(videoOptional.get());
+        Iterable<Comment> commentIterable = commentRepository.findAllByVideoOrderByCreationDesc(videoOptional.get());
         commentIterable.forEach(comments::add);
         return comments;
     }
