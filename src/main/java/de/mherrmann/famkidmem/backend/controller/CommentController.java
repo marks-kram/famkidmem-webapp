@@ -33,8 +33,8 @@ public class CommentController {
     public ResponseEntity<ResponseBody> addComment(@RequestBody AddCommentRequest addCommentRequest, @PathVariable String accessToken) {
         try {
             UserEntity user = userService.getUser(accessToken, "add Comment");
-            commentService.addComment(addCommentRequest, user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseBody("success", "comment added"));
+            String cid = commentService.addComment(addCommentRequest, user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseBody("success", "comment added: " + cid));
         } catch (Exception exception) {
             return ResponseEntity.badRequest().body(new ResponseBody("error", "comment not added", exception));
         }

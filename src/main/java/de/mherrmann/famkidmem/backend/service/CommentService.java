@@ -11,6 +11,7 @@ import de.mherrmann.famkidmem.backend.exception.EntityNotFoundException;
 import de.mherrmann.famkidmem.backend.repository.CommentRepository;
 import de.mherrmann.famkidmem.backend.repository.KeyRepository;
 import de.mherrmann.famkidmem.backend.repository.VideoRepository;
+import de.mherrmann.famkidmem.backend.utils.ConversionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class CommentService {
         this.videoRepository = videoRepository;
     }
 
-    public void addComment(AddCommentRequest addCommentRequest, UserEntity user) throws EntityNotFoundException {
+    public String addComment(AddCommentRequest addCommentRequest, UserEntity user) throws EntityNotFoundException {
         String videoTitle = addCommentRequest.getVideoTitle();
         Optional<Video> videoOptional = videoRepository.findByTitle(videoTitle);
 
@@ -48,10 +49,11 @@ public class CommentService {
         key = keyRepository.save(key);
 
         Comment comment = new Comment(addCommentRequest.getText(), user, videoOptional.get(), key);
-        commentRepository.save(comment);
+        return commentRepository.save(comment).getCid();
     }
 
     public List<Comment> getComments (String videoTitle) throws EntityNotFoundException {
+        videoTitle = ConversionUtil.base64urlToBase64(videoTitle);
         Optional<Video> videoOptional = videoRepository.findByTitle(videoTitle);
 
         if (!videoOptional.isPresent()) {
@@ -67,8 +69,8 @@ public class CommentService {
 
     public void updateComment(UpdateCommentRequest updateCommentRequest, UserEntity user) throws EntityNotFoundException {
         String videoTitle = updateCommentRequest.getVideoTitle();
-        String oldText = updateCommentRequest.getOldText();
-        Comment comment = getComment(user, videoTitle, oldText);
+        String cid = updateCommentRequest.getCid();
+        Comment comment = getComment(user, videoTitle, cid);
         comment.setText(updateCommentRequest.getText());
         comment.setModifiedTrue();
         comment.setModificationToNow();
@@ -76,16 +78,16 @@ public class CommentService {
     }
 
     public void removeComment (RemoveCommentRequest removeCommentRequest, UserEntity user) throws EntityNotFoundException {
-        String videoTitle = removeCommentRequest.getVideoTitle();
-        String text = removeCommentRequest.getText();
-        Comment comment = getComment(user, videoTitle, text);
+        String cid = removeCommentRequest.getVideoTitle();
+        String text = removeCommentRequest.getCid();
+        Comment comment = getComment(user, cid, text);
         comment.setModificationToNow();
         comment.setText(null);
         comment.setRemovedTrue();
         commentRepository.save(comment);
     }
 
-    private Comment getComment(UserEntity user, String videoTitle, String oldText) throws EntityNotFoundException {
+    private Comment getComment(UserEntity user, String videoTitle, String cid) throws EntityNotFoundException {
         Optional<Video> videoOptional = videoRepository.findByTitle(videoTitle);
 
         if (!videoOptional.isPresent()) {
@@ -93,11 +95,11 @@ public class CommentService {
             throw new EntityNotFoundException(Video.class, videoTitle);
         }
 
-        Optional<Comment> commentOptional = commentRepository.findByVideoAndUserAndText(videoOptional.get(), user, oldText);
+        Optional<Comment> commentOptional = commentRepository.findByVideoAndUserAndCid(videoOptional.get(), user, cid);
 
         if (!commentOptional.isPresent()) {
-            LOGGER.error("Could not update comment. Comment not found. video title: {}; old comment text: {}", videoTitle, oldText);
-            throw new EntityNotFoundException(Comment.class, oldText);
+            LOGGER.error("Could not update comment. Comment not found. video title: {}; cid: {}", videoTitle, cid);
+            throw new EntityNotFoundException(Comment.class, cid);
         }
 
         return commentOptional.get();

@@ -12,6 +12,7 @@ import de.mherrmann.famkidmem.backend.exception.EntityNotFoundException;
 import de.mherrmann.famkidmem.backend.repository.CommentRepository;
 import de.mherrmann.famkidmem.backend.repository.VideoRepository;
 import de.mherrmann.famkidmem.backend.service.ccms.EditVideoService;
+import de.mherrmann.famkidmem.backend.utils.ConversionUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +65,7 @@ public class CommentServiceTest {
     public void shouldAddComment() throws EntityNotFoundException {
         AddCommentRequest addCommentRequest = createAddCommentRequest();
 
-        commentService.addComment(addCommentRequest, user);
+        String cid = commentService.addComment(addCommentRequest, user);
 
         assertThat(commentRepository.count()).isEqualTo(1);
         assertThat(commentRepository.findAll().iterator()).hasNext();
@@ -73,6 +74,7 @@ public class CommentServiceTest {
         assertThat(comment.getUser().getUsername()).isEqualTo(user.getUsername());
         assertThat(comment.getVideo().getTitle()).isEqualTo(video.getTitle());
         assertThat(comment.isRemoved()).isFalse();
+        assertThat(cid).isNotNull().isNotEmpty();
     }
 
     @Test
@@ -91,7 +93,7 @@ public class CommentServiceTest {
         commentService.addComment(addCommentRequest2, user);
         commentService.addComment(addCommentRequest3, user);
 
-        List<Comment> comments = commentService.getComments(video.getTitle());
+        List<Comment> comments = commentService.getComments(ConversionUtil.base64ToBase64url(video.getTitle()));
 
         assertThat(comments).hasSize(2);
         assertThat(comments.get(0).getText()).isEqualTo("text1");
@@ -108,16 +110,16 @@ public class CommentServiceTest {
         addCommentRequest.setVideoTitle("another");
         commentService.addComment(addCommentRequest, user);
 
-        List<Comment> comments = commentService.getComments(video.getTitle());
+        List<Comment> comments = commentService.getComments(ConversionUtil.base64ToBase64url(video.getTitle()));
 
         assertThat(comments).isEmpty();
     }
 
     @Test
     public void shouldUpdateComment() throws Exception {
-        UpdateCommentRequest updateCommentRequest = createUpdateCommentRequest();
         AddCommentRequest addCommentRequest = createAddCommentRequest();
-        commentService.addComment(addCommentRequest, user);
+        String cid = commentService.addComment(addCommentRequest, user);
+        UpdateCommentRequest updateCommentRequest = createUpdateCommentRequest(cid);
 
         commentService.updateComment(updateCommentRequest, user);
 
@@ -131,9 +133,9 @@ public class CommentServiceTest {
 
     @Test
     public void shouldDeleteComment() throws Exception {
-        RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest();
         AddCommentRequest addCommentRequest = createAddCommentRequest();
-        commentService.addComment(addCommentRequest, user);
+        String cid = commentService.addComment(addCommentRequest, user);
+        RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest(cid);
 
         commentService.removeComment(removeCommentRequest, user);
         assertThat(commentRepository.count()).isEqualTo(1);
@@ -169,23 +171,23 @@ public class CommentServiceTest {
         Exception exception = null;
 
         try {
-            commentService.getComments("missing");
+            commentService.getComments("missing_");
         } catch (Exception ex) {
             exception = ex;
         }
 
         assertThat(exception).isNotNull().isInstanceOf(EntityNotFoundException.class).hasMessage(
-                new EntityNotFoundException(Video.class, "missing").getMessage()
+                new EntityNotFoundException(Video.class, "missing/").getMessage()
         );
         assertThat(commentRepository.count()).isEqualTo(1);
     }
 
     @Test
     public void shouldThrowExceptionDueToMissingVideoOnUpdateComment() throws Exception {
-        UpdateCommentRequest updateCommentRequest = createUpdateCommentRequest();
-        updateCommentRequest.setVideoTitle("missing");
         AddCommentRequest addCommentRequest = createAddCommentRequest();
-        commentService.addComment(addCommentRequest, user);
+        String cid = commentService.addComment(addCommentRequest, user);
+        UpdateCommentRequest updateCommentRequest = createUpdateCommentRequest(cid);
+        updateCommentRequest.setVideoTitle("missing");
         Exception exception = null;
 
         try {
@@ -202,10 +204,9 @@ public class CommentServiceTest {
 
     @Test
     public void shouldThrowExceptionDueToMissingCommentOnUpdateComment() throws Exception {
-        UpdateCommentRequest updateCommentRequest = createUpdateCommentRequest();
-        updateCommentRequest.setOldText("missing");
         AddCommentRequest addCommentRequest = createAddCommentRequest();
         commentService.addComment(addCommentRequest, user);
+        UpdateCommentRequest updateCommentRequest = createUpdateCommentRequest("missing");
         Exception exception = null;
 
         try {
@@ -215,17 +216,17 @@ public class CommentServiceTest {
         }
 
         assertThat(exception).isNotNull().isInstanceOf(EntityNotFoundException.class).hasMessage(
-                new EntityNotFoundException(Comment.class, updateCommentRequest.getOldText()).getMessage()
+                new EntityNotFoundException(Comment.class, updateCommentRequest.getCid()).getMessage()
         );
         assertThat(commentRepository.count()).isEqualTo(1);
     }
 
     @Test
     public void shouldThrowExceptionDueToMissingVideoOnRemoveComment() throws Exception {
-        RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest();
-        removeCommentRequest.setVideoTitle("missing");
         AddCommentRequest addCommentRequest = createAddCommentRequest();
-        commentService.addComment(addCommentRequest, user);
+        String cid = commentService.addComment(addCommentRequest, user);
+        RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest(cid);
+        removeCommentRequest.setVideoTitle("missing");
         Exception exception = null;
 
         try {
@@ -243,10 +244,9 @@ public class CommentServiceTest {
 
     @Test
     public void shouldThrowExceptionDueToMissingCommentOnRemoveComment() throws Exception {
-        RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest();
-        removeCommentRequest.setText("missing");
         AddCommentRequest addCommentRequest = createAddCommentRequest();
         commentService.addComment(addCommentRequest, user);
+        RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest("missing");
         Exception exception = null;
 
         try {
@@ -256,7 +256,7 @@ public class CommentServiceTest {
         }
 
         assertThat(exception).isNotNull().isInstanceOf(EntityNotFoundException.class).hasMessage(
-                new EntityNotFoundException(Comment.class, removeCommentRequest.getText()).getMessage()
+                new EntityNotFoundException(Comment.class, removeCommentRequest.getCid()).getMessage()
         );
         assertThat(commentRepository.findAll().iterator()).hasNext();
         assertThat(commentRepository.findAll().iterator().next().isRemoved()).isFalse();
@@ -271,17 +271,17 @@ public class CommentServiceTest {
         return addCommentRequest;
     }
 
-    private UpdateCommentRequest createUpdateCommentRequest () {
+    private UpdateCommentRequest createUpdateCommentRequest (String cid) {
         UpdateCommentRequest updateCommentRequest = new UpdateCommentRequest();
         updateCommentRequest.setText("updated");
-        updateCommentRequest.setOldText("test");
+        updateCommentRequest.setCid(cid);
         updateCommentRequest.setVideoTitle(video.getTitle());
         return updateCommentRequest;
     }
 
-    private RemoveCommentRequest createRemoveCommentRequest () {
+    private RemoveCommentRequest createRemoveCommentRequest (String cid) {
         RemoveCommentRequest removeCommentRequest = new RemoveCommentRequest();
-        removeCommentRequest.setText("test");
+        removeCommentRequest.setCid(cid);
         removeCommentRequest.setVideoTitle(video.getTitle());
         return removeCommentRequest;
     }

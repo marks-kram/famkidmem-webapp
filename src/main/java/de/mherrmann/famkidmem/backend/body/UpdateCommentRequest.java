@@ -3,7 +3,7 @@ package de.mherrmann.famkidmem.backend.body;
 public class UpdateCommentRequest {
     private String text;
 
-    private String oldText;
+    private String cid;
     private String videoTitle;
 
     public String getText() {
@@ -14,12 +14,12 @@ public class UpdateCommentRequest {
         this.text = text;
     }
 
-    public String getOldText() {
-        return oldText;
+    public String getCid() {
+        return cid;
     }
 
-    public void setOldText(String oldText) {
-        this.oldText = oldText;
+    public void setCid(String cid) {
+        this.cid = cid;
     }
 
     public String getVideoTitle() {

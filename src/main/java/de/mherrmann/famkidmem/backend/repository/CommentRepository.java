@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface CommentRepository extends CrudRepository<Comment, String> {
     Iterable<Comment> findAllByVideo(Video video);
 
-    Optional<Comment> findByVideoAndUserAndText(Video video, UserEntity user, String text);
+    Optional<Comment> findByVideoAndUserAndCid(Video video, UserEntity user, String text);
 }

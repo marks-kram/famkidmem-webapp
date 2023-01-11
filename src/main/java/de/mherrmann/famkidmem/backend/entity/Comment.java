@@ -10,6 +10,9 @@ public class Comment {
     @Id
     private String id;
 
+    @Column(unique = true)
+    private String cid;
+
     private String text;
     private long creation;
     private long modification;
@@ -32,6 +35,7 @@ public class Comment {
 
     public Comment (String text, UserEntity user, Video video, Key key) {
         this.id = UUID.randomUUID().toString();
+        this.cid = UUID.randomUUID().toString();
         this.text = text;
         this.creation = System.currentTimeMillis();
         this.modification = -1L;
@@ -43,6 +47,10 @@ public class Comment {
     @JsonIgnore
     public String getId() {
         return id;
+    }
+
+    public String getCid() {
+        return cid;
     }
 
     public String getText() {

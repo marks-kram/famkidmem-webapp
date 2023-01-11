@@ -1,15 +1,15 @@
 package de.mherrmann.famkidmem.backend.body;
 
 public class RemoveCommentRequest {
-    private String text;
+    private String cid;
     private String videoTitle;
 
-    public String getText() {
-        return text;
+    public String getCid() {
+        return cid;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setCid(String cid) {
+        this.cid = cid;
     }
 
     public String getVideoTitle() {

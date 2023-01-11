@@ -15,6 +15,7 @@ import de.mherrmann.famkidmem.backend.repository.CommentRepository;
 import de.mherrmann.famkidmem.backend.repository.VideoRepository;
 import de.mherrmann.famkidmem.backend.service.CommentService;
 import de.mherrmann.famkidmem.backend.service.ccms.EditVideoService;
+import de.mherrmann.famkidmem.backend.utils.ConversionUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -85,7 +86,7 @@ public class CommentControllerTest {
 
         ResponseBody body = jsonToResponseBody(mvcResult.getResponse().getContentAsString());
         assertThat(body.getMessage()).isEqualTo("success");
-        assertThat(body.getDetails()).isEqualTo("comment added");
+        assertThat(body.getDetails()).startsWith("comment added: ");
         assertThat(body.getException()).isNull();
         assertThat(commentRepository.count()).isEqualTo(1);
     }
@@ -95,7 +96,9 @@ public class CommentControllerTest {
         AddCommentRequest addCommentRequest = createAddCommentRequest();
         commentService.addComment(addCommentRequest, user);
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/api/comment/get/{videoTitle}/{accessToken}", video.getTitle(), accessToken))
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/comment/get/{videoTitle}/{accessToken}",
+                        ConversionUtil.base64ToBase64url(video.getTitle()),
+                        accessToken))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -110,8 +113,8 @@ public class CommentControllerTest {
     @Test
     public void shouldUpdateComment() throws Exception {
         AddCommentRequest addCommentRequest = createAddCommentRequest();
-        UpdateCommentRequest updateCommentRequest = createUpdateCommentRequest();
-        commentService.addComment(addCommentRequest, user);
+        String cid = commentService.addComment(addCommentRequest, user);
+        UpdateCommentRequest updateCommentRequest = createUpdateCommentRequest(cid);
 
         MvcResult mvcResult = this.mockMvc.perform(put("/api/comment/update/{accessToken}", accessToken)
                 .contentType("application/json")
@@ -131,8 +134,8 @@ public class CommentControllerTest {
     @Test
     public void shouldDeleteComment() throws Exception {
         AddCommentRequest addCommentRequest = createAddCommentRequest();
-        RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest();
-        commentService.addComment(addCommentRequest, user);
+        String cid = commentService.addComment(addCommentRequest, user);
+        RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest(cid);
 
         MvcResult mvcResult = this.mockMvc.perform(delete("/api/comment/delete/{accessToken}", accessToken)
                 .contentType("application/json")
@@ -180,8 +183,7 @@ public class CommentControllerTest {
 
     @Test
     public void shouldFailToUpdateCommentDueToMissingVideo() throws Exception {
-        UpdateCommentRequest updateCommentRequest = createUpdateCommentRequest();
-        updateCommentRequest.setVideoTitle("missing");
+        UpdateCommentRequest updateCommentRequest = createUpdateCommentRequest("missing");
 
         MvcResult mvcResult = this.mockMvc.perform(put("/api/comment/update/{accessToken}", accessToken)
                 .contentType("application/json")
@@ -196,10 +198,10 @@ public class CommentControllerTest {
 
     @Test
     public void shouldFailToDeleteCommentDueToMissingVideo() throws Exception {
-        RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest();
-        removeCommentRequest.setVideoTitle("missing");
         AddCommentRequest addCommentRequest = createAddCommentRequest();
-        commentService.addComment(addCommentRequest, user);
+        String cid = commentService.addComment(addCommentRequest, user);
+        RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest(cid);
+        removeCommentRequest.setVideoTitle("missing");
 
         MvcResult mvcResult = this.mockMvc.perform(delete("/api/comment/delete/{accessToken}", accessToken)
                 .contentType("application/json")
@@ -240,9 +242,12 @@ public class CommentControllerTest {
 
     @Test
     public void shouldFailToUpdateCommentDueToInvalidAccessToken() throws Exception {
+        AddCommentRequest addCommentRequest = createAddCommentRequest();
+        String cid = commentService.addComment(addCommentRequest, user);
+
         MvcResult mvcResult = this.mockMvc.perform(put("/api/comment/update/{accessToken}", "invalid")
                 .contentType("application/json")
-                .content(asJsonString(createUpdateCommentRequest()))
+                .content(asJsonString(createUpdateCommentRequest(cid)))
         ).andExpect(status().is(HttpStatus.BAD_REQUEST.value())).andReturn();
 
         ResponseBody body = jsonToResponseBody(mvcResult.getResponse().getContentAsString());
@@ -254,11 +259,11 @@ public class CommentControllerTest {
     @Test
     public void shouldFailToDeleteCommentDueToInvalidAccessToken() throws Exception {
         AddCommentRequest addCommentRequest = createAddCommentRequest();
-        commentService.addComment(addCommentRequest, user);
+        String cid = commentService.addComment(addCommentRequest, user);
 
         MvcResult mvcResult = this.mockMvc.perform(delete("/api/comment/delete/{accessToken}", "invalid")
                 .contentType("application/json")
-                .content(asJsonString(createRemoveCommentRequest()))
+                .content(asJsonString(createRemoveCommentRequest(cid)))
         ).andExpect(status().is(HttpStatus.BAD_REQUEST.value())).andReturn();
 
         ResponseBody body = jsonToResponseBody(mvcResult.getResponse().getContentAsString());
@@ -274,22 +279,22 @@ public class CommentControllerTest {
         addCommentRequest.setText("test");
         addCommentRequest.setKey("key");
         addCommentRequest.setIv("iv");
-        addCommentRequest.setVideoTitle("title");
+        addCommentRequest.setVideoTitle(video.getTitle());
         return addCommentRequest;
     }
 
-    private UpdateCommentRequest createUpdateCommentRequest () {
+    private UpdateCommentRequest createUpdateCommentRequest (String cid) {
         UpdateCommentRequest updateCommentRequest = new UpdateCommentRequest();
         updateCommentRequest.setText("updated");
-        updateCommentRequest.setOldText("test");
-        updateCommentRequest.setVideoTitle("title");
+        updateCommentRequest.setCid(cid);
+        updateCommentRequest.setVideoTitle(video.getTitle());
         return updateCommentRequest;
     }
 
-    private RemoveCommentRequest createRemoveCommentRequest () {
+    private RemoveCommentRequest createRemoveCommentRequest (String cid) {
         RemoveCommentRequest removeCommentRequest = new RemoveCommentRequest();
-        removeCommentRequest.setText("test");
-        removeCommentRequest.setVideoTitle("title");
+        removeCommentRequest.setCid(cid);
+        removeCommentRequest.setVideoTitle(video.getTitle());
         return removeCommentRequest;
     }
 
