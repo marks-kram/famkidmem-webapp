@@ -113,7 +113,7 @@ public class TestUtils {
 
     public RequestBodyAddVideo createAddVideoRequest() throws IOException {
         return createAddVideoRequest(
-                "title",
+                "title/",
                 "key",
                 "iv",
                 "m3u8",
@@ -179,7 +179,7 @@ public class TestUtils {
 
     public RequestBodyUpdateVideo createUpdateVideoRequest() {
         RequestBodyUpdateVideo updateVideoRequest = new RequestBodyUpdateVideo();
-        updateVideoRequest.setDesignator("title");
+        updateVideoRequest.setDesignator("title/");
         updateVideoRequest.setTitle("newTitle");
         updateVideoRequest.setDescription("newDescription");
         updateVideoRequest.setKey("newKey");

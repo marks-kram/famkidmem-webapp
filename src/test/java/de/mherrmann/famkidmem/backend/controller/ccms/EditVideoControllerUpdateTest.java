@@ -20,8 +20,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -77,7 +75,7 @@ public class EditVideoControllerUpdateTest {
     }
 
     @Test
-    public void shouldFailAddVideoCausedByEntityNotFound() throws Exception {
+    public void shouldFailUpdateVideoCausedByEntityNotFound() throws Exception {
         RequestBodyUpdateVideo updateVideoRequest = testUtils.createUpdateVideoRequest();
         updateVideoRequest.setDesignator("invalid");
 
@@ -85,7 +83,7 @@ public class EditVideoControllerUpdateTest {
     }
 
     @Test
-    public void shouldFailAddVideoCausedByMissingTitle() throws Exception {
+    public void shouldFailUpdateVideoCausedByMissingTitle() throws Exception {
         RequestBodyUpdateVideo updateVideoRequest = testUtils.createUpdateVideoRequest();
         updateVideoRequest.setTitle("");
 
@@ -93,7 +91,7 @@ public class EditVideoControllerUpdateTest {
     }
 
     @Test
-    public void shouldFailAddVideoCausedByMissingKey() throws Exception {
+    public void shouldFailUpdateVideoCausedByMissingKey() throws Exception {
         RequestBodyUpdateVideo updateVideoRequest = testUtils.createUpdateVideoRequest();
         updateVideoRequest.setKey("");
 
@@ -101,7 +99,7 @@ public class EditVideoControllerUpdateTest {
     }
 
     @Test
-    public void shouldFailAddVideoCausedByMissingIv() throws Exception {
+    public void shouldFailUpdateVideoCausedByMissingIv() throws Exception {
         RequestBodyUpdateVideo updateVideoRequest = testUtils.createUpdateVideoRequest();
         updateVideoRequest.setIv("");
 
@@ -109,7 +107,7 @@ public class EditVideoControllerUpdateTest {
     }
 
     @Test
-    public void shouldFailAddVideoCausedByMissingThumbnailKey() throws Exception {
+    public void shouldFailUpdateVideoCausedByMissingThumbnailKey() throws Exception {
         RequestBodyUpdateVideo updateVideoRequest = testUtils.createUpdateVideoRequest();
         updateVideoRequest.setThumbnailKey("");
 
@@ -117,7 +115,7 @@ public class EditVideoControllerUpdateTest {
     }
 
     @Test
-    public void shouldFailAddVideoCausedByMissingThumbnailIv() throws Exception {
+    public void shouldFailUpdateVideoCausedByMissingThumbnailIv() throws Exception {
         RequestBodyUpdateVideo updateVideoRequest = testUtils.createUpdateVideoRequest();
         updateVideoRequest.setThumbnailIv("");
 
@@ -125,7 +123,7 @@ public class EditVideoControllerUpdateTest {
     }
 
     @Test
-    public void shouldFailAddVideoCausedByEponymousVideoExists() throws Exception {
+    public void shouldFailUpdateVideoCausedByEponymousVideoExists() throws Exception {
         RequestBodyAddVideo addVideoRequest = testUtils.createAddVideoRequest();
         RequestBodyUpdateVideo updateVideoRequest = testUtils.createUpdateVideoRequest();
         addVideoRequest.setTitle("eponymous");
@@ -155,7 +153,7 @@ public class EditVideoControllerUpdateTest {
         assertThat(message).isEqualTo("error");
         assertThat(details).isEqualTo(expectedDetails);
         assertThat(videoRepository.count()).isEqualTo(countBefore);
-        assertThat(videoRepository.existsByTitle("title")).isTrue();
+        assertThat(videoRepository.existsByTitle("title/")).isTrue();
     }
 
     private static String asJsonString(final Object obj) {

@@ -69,12 +69,12 @@ public class EditVideoControllerGetTest {
         assertThat(message).isEqualTo("ok");
         assertThat(details).isEqualTo("Successfully got videos");
         assertThat(videos.size()).isEqualTo(1);
-        assertThat(videos.get(0).getTitle()).isEqualTo("title");
+        assertThat(videos.get(0).getTitle()).isEqualTo("title/");
     }
 
     @Test
     public void shouldGetSingleVideo() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(get("/ccms/edit/video/get/title")
+        MvcResult mvcResult = this.mockMvc.perform(get("/ccms/edit/video/get/title_")
                 .header("CCMS-AUTH-TOKEN", "token"))
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn();
@@ -85,7 +85,7 @@ public class EditVideoControllerGetTest {
         assertThat(message).isEqualTo("ok");
         assertThat(details).isEqualTo("Successfully got video");
         assertThat(videos.size()).isEqualTo(1);
-        assertThat(videos.get(0).getTitle()).isEqualTo("title");
+        assertThat(videos.get(0).getTitle()).isEqualTo("title/");
     }
 
     @Test

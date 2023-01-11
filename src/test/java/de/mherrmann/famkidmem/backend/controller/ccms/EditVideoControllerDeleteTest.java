@@ -17,11 +17,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -58,7 +55,7 @@ public class EditVideoControllerDeleteTest {
     @Test
     public void shouldDeleteVideo() throws Exception {
 
-        MvcResult mvcResult = this.mockMvc.perform(delete("/ccms/edit/video/delete/{designator}", "title")
+        MvcResult mvcResult = this.mockMvc.perform(delete("/ccms/edit/video/delete/{designator}", "title_")
                 .header("CCMS-AUTH-TOKEN", "token"))
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn();
@@ -66,8 +63,8 @@ public class EditVideoControllerDeleteTest {
         String message = jsonToResponse(mvcResult.getResponse().getContentAsString()).getMessage();
         String details = jsonToResponse(mvcResult.getResponse().getContentAsString()).getDetails();
         assertThat(message).isEqualTo("ok");
-        assertThat(details).isEqualTo("Successfully removed video: title");
-        assertThat(videoRepository.existsByTitle("title")).isFalse();
+        assertThat(details).isEqualTo("Successfully removed video: title/");
+        assertThat(videoRepository.existsByTitle("title/")).isFalse();
         assertThat(videoRepository.existsByTitle("video2")).isTrue();
     }
 
@@ -82,7 +79,7 @@ public class EditVideoControllerDeleteTest {
         String details = jsonToResponse(mvcResult.getResponse().getContentAsString()).getDetails();
         assertThat(message).isEqualTo("error");
         assertThat(details).isEqualTo("Entity does not exist. Type: Video; designator: invalid");
-        assertThat(videoRepository.existsByTitle("title")).isTrue();
+        assertThat(videoRepository.existsByTitle("title/")).isTrue();
         assertThat(videoRepository.existsByTitle("video2")).isTrue();
     }
 

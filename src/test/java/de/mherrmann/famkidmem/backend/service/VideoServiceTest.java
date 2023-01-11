@@ -175,7 +175,7 @@ public class VideoServiceTest {
     private void assertIndex(ResponseBodyContentIndex contentIndex, boolean userHasPermission2){
         assertThat(contentIndex).isNotNull();
         assertThat(contentIndex.getVideos().size()).isEqualTo(userHasPermission2 ? 2 : 1);
-        assertThat(contentIndex.getVideos().get(0).getTitle()).isEqualTo("title");
+        assertThat(contentIndex.getVideos().get(0).getTitle()).isEqualTo("title/");
         if(userHasPermission2){
             assertThat(contentIndex.getVideos().get(1).getTitle()).isEqualTo("video2");
         }
@@ -195,7 +195,7 @@ public class VideoServiceTest {
         assertThat(contentIndex).isNotNull();
         assertThat(contentIndex.getVideos().size()).isEqualTo(2);
         assertThat(contentIndex.getVideos().get(0).getTitle()).isEqualTo("video2");
-        assertThat(contentIndex.getVideos().get(1).getTitle()).isEqualTo("title");
+        assertThat(contentIndex.getVideos().get(1).getTitle()).isEqualTo("title/");
         assertThat(contentIndex.getPersons().size()).isEqualTo(4);
         assertThat(contentIndex.getPersons().get(0)).isEqualTo("personFour");
         assertThat(contentIndex.getPersons().get(1)).isEqualTo("personOne");
@@ -267,8 +267,8 @@ public class VideoServiceTest {
         updateVideo2Request.setPersons(Arrays.asList("personThree", "personFour"));
         updateVideo1Request.setYears(Arrays.asList(2004, 2002));
         updateVideo2Request.setYears(Arrays.asList(2001, 2003));
-        updateVideo1Request.setTitle("title");
-        updateVideo1Request.setDesignator("title");
+        updateVideo1Request.setTitle("title/");
+        updateVideo1Request.setDesignator("title/");
         updateVideo2Request.setTitle("video2");
         updateVideo2Request.setDesignator("video2");
         try {
