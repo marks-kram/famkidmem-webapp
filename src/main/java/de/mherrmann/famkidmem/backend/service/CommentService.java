@@ -1,7 +1,6 @@
 package de.mherrmann.famkidmem.backend.service;
 
 import de.mherrmann.famkidmem.backend.body.AddCommentRequest;
-import de.mherrmann.famkidmem.backend.body.RemoveCommentRequest;
 import de.mherrmann.famkidmem.backend.body.UpdateCommentRequest;
 import de.mherrmann.famkidmem.backend.entity.Comment;
 import de.mherrmann.famkidmem.backend.entity.Key;
@@ -68,37 +67,27 @@ public class CommentService {
     }
 
     public void updateComment(UpdateCommentRequest updateCommentRequest, UserEntity user) throws EntityNotFoundException {
-        String videoTitle = updateCommentRequest.getVideoTitle();
         String cid = updateCommentRequest.getCid();
-        Comment comment = getComment(user, videoTitle, cid);
+        Comment comment = getComment(user, cid);
         comment.setText(updateCommentRequest.getText());
         comment.setModifiedTrue();
         comment.setModificationToNow();
         commentRepository.save(comment);
     }
 
-    public void removeComment (RemoveCommentRequest removeCommentRequest, UserEntity user) throws EntityNotFoundException {
-        String cid = removeCommentRequest.getVideoTitle();
-        String text = removeCommentRequest.getCid();
-        Comment comment = getComment(user, cid, text);
+    public void removeComment (String cid, UserEntity user) throws EntityNotFoundException {
+        Comment comment = getComment(user, cid);
         comment.setModificationToNow();
         comment.setText(null);
         comment.setRemovedTrue();
         commentRepository.save(comment);
     }
 
-    private Comment getComment(UserEntity user, String videoTitle, String cid) throws EntityNotFoundException {
-        Optional<Video> videoOptional = videoRepository.findByTitle(videoTitle);
-
-        if (!videoOptional.isPresent()) {
-            LOGGER.error("Could not update comment or remove for Video. Video not found. title: {}", videoTitle);
-            throw new EntityNotFoundException(Video.class, videoTitle);
-        }
-
-        Optional<Comment> commentOptional = commentRepository.findByVideoAndUserAndCid(videoOptional.get(), user, cid);
+    private Comment getComment(UserEntity user, String cid) throws EntityNotFoundException {
+        Optional<Comment> commentOptional = commentRepository.findByUserAndCid(user, cid);
 
         if (!commentOptional.isPresent()) {
-            LOGGER.error("Could not update or remove comment. Comment not found. video title: {}; cid: {}", videoTitle, cid);
+            LOGGER.error("Could not update or remove comment. Comment not found. comment cid: {}", cid);
             throw new EntityNotFoundException(Comment.class, cid);
         }
 

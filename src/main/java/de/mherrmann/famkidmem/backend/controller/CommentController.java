@@ -1,7 +1,6 @@
 package de.mherrmann.famkidmem.backend.controller;
 
 import de.mherrmann.famkidmem.backend.body.AddCommentRequest;
-import de.mherrmann.famkidmem.backend.body.RemoveCommentRequest;
 import de.mherrmann.famkidmem.backend.body.ResponseBody;
 import de.mherrmann.famkidmem.backend.body.UpdateCommentRequest;
 import de.mherrmann.famkidmem.backend.body.content.ResponseBodyComments;
@@ -62,11 +61,11 @@ public class CommentController {
         }
     }
 
-    @DeleteMapping(value = "/delete/{accessToken}")
-    public ResponseEntity<ResponseBody> deleteComment(@RequestBody RemoveCommentRequest removeCommentRequest, @PathVariable String accessToken) {
+    @DeleteMapping(value = "/delete/{cid}/{accessToken}")
+    public ResponseEntity<ResponseBody> deleteComment(@PathVariable String cid, @PathVariable String accessToken) {
         try {
             UserEntity user = userService.getUser(accessToken, "remove comment");
-            commentService.removeComment(removeCommentRequest, user);
+            commentService.removeComment(cid, user);
             return ResponseEntity.ok().body(new ResponseBody("success", "comment removed"));
         } catch (Exception exception) {
             return ResponseEntity.badRequest().body(new ResponseBody("error", "comment not removed", exception));

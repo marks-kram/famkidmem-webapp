@@ -3,7 +3,6 @@ package de.mherrmann.famkidmem.backend.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.mherrmann.famkidmem.backend.TestUtils;
 import de.mherrmann.famkidmem.backend.body.AddCommentRequest;
-import de.mherrmann.famkidmem.backend.body.RemoveCommentRequest;
 import de.mherrmann.famkidmem.backend.body.ResponseBody;
 import de.mherrmann.famkidmem.backend.body.UpdateCommentRequest;
 import de.mherrmann.famkidmem.backend.body.content.ResponseBodyComments;
@@ -135,12 +134,10 @@ public class CommentControllerTest {
     public void shouldDeleteComment() throws Exception {
         AddCommentRequest addCommentRequest = createAddCommentRequest();
         String cid = commentService.addComment(addCommentRequest, user);
-        RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest(cid);
 
-        MvcResult mvcResult = this.mockMvc.perform(delete("/api/comment/delete/{accessToken}", accessToken)
-                .contentType("application/json")
-                .content(asJsonString(removeCommentRequest))
-        ).andExpect(status().isOk()).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(delete("/api/comment/delete/{cid}/{accessToken}", cid, accessToken))
+                .andExpect(status().isOk())
+                .andReturn();
 
         ResponseBody body = jsonToResponseBody(mvcResult.getResponse().getContentAsString());
         assertThat(body.getMessage()).isEqualTo("success");
@@ -179,41 +176,6 @@ public class CommentControllerTest {
         assertThat(body.getDetails()).isEqualTo("could not get comments");
         assertThat(body.getComments()).isNull();
         assertThat(body.getException()).isEqualTo(EntityNotFoundException.class.getSimpleName());
-    }
-
-    @Test
-    public void shouldFailToUpdateCommentDueToMissingVideo() throws Exception {
-        UpdateCommentRequest updateCommentRequest = createUpdateCommentRequest("missing");
-
-        MvcResult mvcResult = this.mockMvc.perform(put("/api/comment/update/{accessToken}", accessToken)
-                .contentType("application/json")
-                .content(asJsonString(updateCommentRequest))
-        ).andExpect(status().isBadRequest()).andReturn();
-
-        ResponseBody body = jsonToResponseBody(mvcResult.getResponse().getContentAsString());
-        assertThat(body.getMessage()).isEqualTo("error");
-        assertThat(body.getDetails()).isEqualTo("comment not updated");
-        assertThat(body.getException()).isEqualTo(EntityNotFoundException.class.getSimpleName());
-    }
-
-    @Test
-    public void shouldFailToDeleteCommentDueToMissingVideo() throws Exception {
-        AddCommentRequest addCommentRequest = createAddCommentRequest();
-        String cid = commentService.addComment(addCommentRequest, user);
-        RemoveCommentRequest removeCommentRequest = createRemoveCommentRequest(cid);
-        removeCommentRequest.setVideoTitle("missing");
-
-        MvcResult mvcResult = this.mockMvc.perform(delete("/api/comment/delete/{accessToken}", accessToken)
-                .contentType("application/json")
-                .content(asJsonString(removeCommentRequest))
-        ).andExpect(status().isBadRequest()).andReturn();
-
-        ResponseBody body = jsonToResponseBody(mvcResult.getResponse().getContentAsString());
-        assertThat(body.getMessage()).isEqualTo("error");
-        assertThat(body.getDetails()).isEqualTo("comment not removed");
-        assertThat(body.getException()).isEqualTo(EntityNotFoundException.class.getSimpleName());
-        assertThat(commentRepository.findAll().iterator()).hasNext();
-        assertThat(commentRepository.findAll().iterator().next().isRemoved()).isFalse();
     }
 
     @Test
@@ -261,10 +223,9 @@ public class CommentControllerTest {
         AddCommentRequest addCommentRequest = createAddCommentRequest();
         String cid = commentService.addComment(addCommentRequest, user);
 
-        MvcResult mvcResult = this.mockMvc.perform(delete("/api/comment/delete/{accessToken}", "invalid")
-                .contentType("application/json")
-                .content(asJsonString(createRemoveCommentRequest(cid)))
-        ).andExpect(status().is(HttpStatus.BAD_REQUEST.value())).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(delete("/api/comment/delete/{cid}/{accessToken}", cid, "invalid"))
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andReturn();
 
         ResponseBody body = jsonToResponseBody(mvcResult.getResponse().getContentAsString());
         assertThat(body.getMessage()).isEqualTo("error");
@@ -287,15 +248,7 @@ public class CommentControllerTest {
         UpdateCommentRequest updateCommentRequest = new UpdateCommentRequest();
         updateCommentRequest.setText("updated");
         updateCommentRequest.setCid(cid);
-        updateCommentRequest.setVideoTitle(video.getTitle());
         return updateCommentRequest;
-    }
-
-    private RemoveCommentRequest createRemoveCommentRequest (String cid) {
-        RemoveCommentRequest removeCommentRequest = new RemoveCommentRequest();
-        removeCommentRequest.setCid(cid);
-        removeCommentRequest.setVideoTitle(video.getTitle());
-        return removeCommentRequest;
     }
 
     private static ResponseBody jsonToResponseBody(final String json) {
