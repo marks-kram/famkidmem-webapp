@@ -8,7 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.Optional;
 
 public interface CommentRepository extends CrudRepository<Comment, String> {
-    Iterable<Comment> findAllByVideoOrderByCreationDesc(Video video);
+    Iterable<Comment> findAllByVideoOrderByCreationAsc(Video video);
 
     Optional<Comment> findByUserAndCid(UserEntity user, String text);
 }

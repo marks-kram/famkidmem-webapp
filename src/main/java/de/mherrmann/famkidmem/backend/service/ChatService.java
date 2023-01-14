@@ -32,14 +32,14 @@ public class ChatService {
     }
 
     public List<ChatMessage> getAllMessages () {
-        Iterable<ChatMessage> messagesIterable = chatMessageRepository.findAll();
+        Iterable<ChatMessage> messagesIterable = chatMessageRepository.findAllByOrderByTimestampAsc();
         List<ChatMessage> messages = new ArrayList<>();
         messagesIterable.forEach(messages::add);
         return messages;
     }
 
     public List<ChatMessage> getMessagesSince (long threshold) {
-        Iterable<ChatMessage> messagesIterable = chatMessageRepository.findAllByTimestampAfter(threshold);
+        Iterable<ChatMessage> messagesIterable = chatMessageRepository.findAllByTimestampAfterOrderByTimestampAsc(threshold);
         List<ChatMessage> messages = new ArrayList<>();
         messagesIterable.forEach(messages::add);
         return messages;

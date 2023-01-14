@@ -5,5 +5,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface ChatMessageRepository extends CrudRepository<ChatMessage, String> {
 
-    Iterable<ChatMessage> findAllByTimestampAfter(long threshold);
+    Iterable<ChatMessage> findAllByOrderByTimestampAsc();
+    Iterable<ChatMessage> findAllByTimestampAfterOrderByTimestampAsc(long threshold);
 }
