@@ -11,6 +11,7 @@ public class ChatMessage {
     @Id
     private String id;
 
+    @Column(length = 1024)
     private String message;
 
     private long timestamp;

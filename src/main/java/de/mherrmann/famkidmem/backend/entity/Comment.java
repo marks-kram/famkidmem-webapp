@@ -13,7 +13,9 @@ public class Comment {
     @Column(unique = true)
     private String cid;
 
+    @Column(length = 1024)
     private String text;
+
     private long creation;
     private long modification;
     private boolean modified;
