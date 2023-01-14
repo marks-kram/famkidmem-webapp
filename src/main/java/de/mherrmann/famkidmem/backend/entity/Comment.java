@@ -13,7 +13,6 @@ public class Comment {
     @Column(unique = true)
     private String cid;
 
-    @Column(length = 1024)
     private String text;
 
     private long creation;
