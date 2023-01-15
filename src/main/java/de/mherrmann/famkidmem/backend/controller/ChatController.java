@@ -41,9 +41,9 @@ public class ChatController {
     @GetMapping(value = "/get-all/{accessToken}")
     public ResponseEntity<ResponseBodyMessages> getAllMessages(@PathVariable String accessToken) {
         try {
-            userService.getUser(accessToken, "get comments");
+            UserEntity user = userService.getUser(accessToken, "get comments");
             List<ChatMessage> messages = chatService.getAllMessages();
-            return ResponseEntity.ok(new ResponseBodyMessages(messages));
+            return ResponseEntity.ok(new ResponseBodyMessages(messages, user.getMasterKey()));
         } catch(Exception ex){
             return ResponseEntity.badRequest().body(new ResponseBodyMessages(ex));
         }
@@ -52,9 +52,9 @@ public class ChatController {
     @GetMapping(value = "/get-since/{threshold}/{accessToken}")
     public ResponseEntity<ResponseBodyMessages> getAllMessages(@PathVariable long threshold, @PathVariable String accessToken) {
         try {
-            userService.getUser(accessToken, "get comments");
+            UserEntity user = userService.getUser(accessToken, "get comments");
             List<ChatMessage> messages = chatService.getMessagesSince(threshold);
-            return ResponseEntity.ok(new ResponseBodyMessages(messages));
+            return ResponseEntity.ok(new ResponseBodyMessages(messages, user.getMasterKey()));
         } catch(Exception ex){
             return ResponseEntity.badRequest().body(new ResponseBodyMessages(ex));
         }

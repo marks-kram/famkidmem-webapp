@@ -8,13 +8,15 @@ import java.util.List;
 public class ResponseBodyMessages extends ResponseBody {
 
     private List<ChatMessage> messages;
+    private String userKey;
 
     @SuppressWarnings("unused") // used reflective
     private ResponseBodyMessages(){}
 
-    public ResponseBodyMessages(List<ChatMessage> messages) {
+    public ResponseBodyMessages(List<ChatMessage> messages, String userKey) {
         super("success", "");
         this.messages = messages;
+        this.userKey = userKey;
     }
 
     public ResponseBodyMessages(Exception ex) {
@@ -23,5 +25,9 @@ public class ResponseBodyMessages extends ResponseBody {
 
     public List<ChatMessage> getMessages() {
         return messages;
+    }
+
+    public String getUserKey() {
+        return userKey;
     }
 }

@@ -83,6 +83,7 @@ public class ChatControllerTest {
         assertThat(body.getDetails()).isEqualTo("");
         assertThat(body.getMessages()).hasSize(1);
         assertThat(body.getMessages().get(0).getMessage()).isEqualTo(addMessageRequest.getMessage());
+        assertThat(body.getUserKey()).isEqualTo(user.getMasterKey());
         assertThat(body.getException()).isNull();
     }
 
@@ -112,6 +113,8 @@ public class ChatControllerTest {
         assertThat(body2.getDetails()).isEqualTo("");
         assertThat(body2.getException()).isNull();
         assertThat(body2.getMessages()).isEmpty();
+        assertThat(body1.getUserKey()).isEqualTo(user.getMasterKey());
+        assertThat(body2.getUserKey()).isEqualTo(user.getMasterKey());
     }
 
 
@@ -143,6 +146,7 @@ public class ChatControllerTest {
         assertThat(body.getDetails()).isEqualTo("could not get chat messages");
         assertThat(body.getMessages()).isNull();
         assertThat(body.getException()).isEqualTo(SecurityException.class.getSimpleName());
+        assertThat(body.getUserKey()).isNull();
     }
 
     @Test
@@ -159,6 +163,7 @@ public class ChatControllerTest {
         assertThat(body.getDetails()).isEqualTo("could not get chat messages");
         assertThat(body.getMessages()).isNull();
         assertThat(body.getException()).isEqualTo(SecurityException.class.getSimpleName());
+        assertThat(body.getUserKey()).isNull();
     }
 
     private AddMessageRequest createAddMessageRequest() {
