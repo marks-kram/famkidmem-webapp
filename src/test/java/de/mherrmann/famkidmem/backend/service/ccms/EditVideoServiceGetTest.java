@@ -4,7 +4,6 @@ import de.mherrmann.famkidmem.backend.TestUtils;
 import de.mherrmann.famkidmem.backend.body.admin.ResponseBodyGetVideos;
 import de.mherrmann.famkidmem.backend.body.content.ResponseBodyContentFileBase64;
 import de.mherrmann.famkidmem.backend.exception.FileNotFoundException;
-import de.mherrmann.famkidmem.backend.exception.SecurityException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +58,7 @@ public class EditVideoServiceGetTest {
         assertThat(responseBodyGetVideos).isNotNull();
         assertThat(responseBodyGetVideos.getVideos()).isNotNull();
         assertThat(responseBodyGetVideos.getVideos().size()).isEqualTo(1);
-        assertThat(responseBodyGetVideos.getVideos().get(0).getTitle()).isEqualTo("title");
+        assertThat(responseBodyGetVideos.getVideos().get(0).getTitle()).isEqualTo("title/");
     }
 
     @Test
@@ -68,7 +67,7 @@ public class EditVideoServiceGetTest {
         Exception exception = null;
 
         try {
-            responseBodyGetVideos = editVideoService.getSingleVideo("title");
+            responseBodyGetVideos = editVideoService.getSingleVideo("title/");
         } catch (Exception ex){
             exception = ex;
         }
@@ -77,7 +76,7 @@ public class EditVideoServiceGetTest {
         assertThat(responseBodyGetVideos).isNotNull();
         assertThat(responseBodyGetVideos.getVideos()).isNotNull();
         assertThat(responseBodyGetVideos.getVideos().size()).isEqualTo(1);
-        assertThat(responseBodyGetVideos.getVideos().get(0).getTitle()).isEqualTo("title");
+        assertThat(responseBodyGetVideos.getVideos().get(0).getTitle()).isEqualTo("title/");
     }
 
     @Test

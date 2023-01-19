@@ -96,6 +96,10 @@ public class UserService {
         return user.getMasterKey();
     }
 
+    public UserEntity getUser(String accessToken, String action) throws SecurityException {
+        return getUserSession(accessToken, action).getUserEntity();
+    }
+
     private void changeUsernameAndOrPassword(UserEntity user, String newUsername, String newLoginHash,
                                           String newPasswordKeySalt, String newMasterKey) throws SecurityException {
 
@@ -114,10 +118,6 @@ public class UserService {
         user.setReset(false);
         userRepository.save(user);
         LOGGER.info("Successfully changed username and/or password. {} -> {}", oldUsername, user.getUsername());
-    }
-
-    UserEntity getUser(String accessToken, String action) throws SecurityException {
-        return getUserSession(accessToken, action).getUserEntity();
     }
 
     private UserSession getUserSession(String accessToken, String action) throws SecurityException {

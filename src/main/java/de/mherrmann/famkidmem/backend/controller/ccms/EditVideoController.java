@@ -6,6 +6,7 @@ import de.mherrmann.famkidmem.backend.body.content.ResponseBodyContentFileBase64
 import de.mherrmann.famkidmem.backend.body.edit.RequestBodyAddVideo;
 import de.mherrmann.famkidmem.backend.body.edit.RequestBodyUpdateVideo;
 import de.mherrmann.famkidmem.backend.service.ccms.EditVideoService;
+import de.mherrmann.famkidmem.backend.utils.ConversionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -70,7 +71,7 @@ public class EditVideoController {
 
     @DeleteMapping(value = "/delete/{designator}")
     public ResponseEntity<ResponseBody> deleteVideo(@PathVariable String designator){
-        designator = designator.replace('_', '/').replace('-', '+');
+        designator = ConversionUtil.base64urlToBase64(designator);
         try {
             editVideoService.deleteVideo(designator);
             return ResponseEntity.ok(new ResponseBody("ok", "Successfully removed video: " + designator));

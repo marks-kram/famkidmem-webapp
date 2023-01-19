@@ -4,7 +4,6 @@ import de.mherrmann.famkidmem.backend.TestUtils;
 import de.mherrmann.famkidmem.backend.entity.Video;
 import de.mherrmann.famkidmem.backend.exception.EntityNotFoundException;
 import de.mherrmann.famkidmem.backend.repository.*;
-import de.mherrmann.famkidmem.backend.service.ccms.EditVideoService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,11 +55,11 @@ public class EditVideoServiceDeleteTest {
     @Test
     public void shouldDeleteVideo() {
         Exception exception = null;
-        Video removed = videoRepository.findByTitle("title").get();
+        Video removed = videoRepository.findByTitle("title/").get();
         Video remained = videoRepository.findByTitle("video2").get();
 
         try {
-            editVideoService.deleteVideo("title");
+            editVideoService.deleteVideo("title/");
         } catch (Exception ex){
             exception = ex;
         }
@@ -81,7 +80,7 @@ public class EditVideoServiceDeleteTest {
 
         assertThat(exception).isNotNull();
         assertThat(exception).isInstanceOf(EntityNotFoundException.class);
-        assertThat(videoRepository.existsByTitle("title")).isTrue();
+        assertThat(videoRepository.existsByTitle("title/")).isTrue();
         assertThat(videoRepository.existsByTitle("video2")).isTrue();
     }
 

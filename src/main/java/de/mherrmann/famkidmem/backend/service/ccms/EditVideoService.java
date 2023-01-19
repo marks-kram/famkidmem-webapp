@@ -15,6 +15,7 @@ import de.mherrmann.famkidmem.backend.service.subentity.FileEntityService;
 import de.mherrmann.famkidmem.backend.service.subentity.KeyEntityService;
 import de.mherrmann.famkidmem.backend.service.subentity.PersonEntityService;
 import de.mherrmann.famkidmem.backend.service.subentity.YearEntityService;
+import de.mherrmann.famkidmem.backend.utils.ConversionUtil;
 import de.mherrmann.famkidmem.backend.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,7 @@ public class EditVideoService {
     }
 
     public ResponseBodyGetVideos getSingleVideo(String title) throws EntityNotFoundException {
-        title = title.replace('_', '/').replace('-', '+');
+        title = ConversionUtil.base64urlToBase64(title);
         List<Video> videos = new ArrayList<>();
         videos.add(getVideo(title));
         ResponseBodyGetVideos videoResponse = new ResponseBodyGetVideos(videos);
