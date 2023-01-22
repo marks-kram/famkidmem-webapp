@@ -8,4 +8,4 @@ This repository contains the sources for the FamKidMem Webapp.
 ### See also
 
 [Server](./server/README.md) \
-[Brwoser](./browser/README.md)
+[Browser](./browser/README.md)
