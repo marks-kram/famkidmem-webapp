@@ -1,0 +1,6 @@
+server/.idea
+server/target
+server/*.iml
+server/files/
+server/*.log
+server/*.gz
